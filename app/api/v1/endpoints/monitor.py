@@ -18,16 +18,16 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
 
     uri = None
     validate_type = None
-    if payload['action'] == 'closed' and not payload['pull_request']['merged_at']:
+    if payload.get('action') == 'closed' and not payload.get('pull_request', {}).get('merged_at'):
         validate_type = VALIDATE_TYPES.CLOSED
-    elif payload['pull_request']:
-        if payload['pull_request']['merged_at']:
+    elif payload.get('pull_request'):
+        if payload.get('pull_request', {}).get('merged_at'):
             validate_type = VALIDATE_TYPES.MERGE
-        elif payload['action'] == 'opened':
+        elif payload.get('action') == 'opened':
             validate_type = VALIDATE_TYPES.PULL_REQUEST
-        uri = payload['pull_request']['issue_url'] + '/comments'
-    elif payload['comment'] and payload['comment']['body'].lower().strip() == 'fixed':
-        uri = payload['comment']['issue_url'] + '/comments'
+        uri = payload.get('pull_request', {}).get('issue_url') + '/comments'
+    elif payload.get('comment') and payload.get('comment', {}).get('body', '').lower().strip() == 'fixed':
+        uri = payload.get('comment', {}).get('issue_url', '') + '/comments'
         validate_type = VALIDATE_TYPES.COMMENT
 
     if not validate_type:
@@ -65,14 +65,14 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
     print(validate_type)
     if validate_type == VALIDATE_TYPES.PULL_REQUEST:
         progress = {
-            'student_id': data['student']['_id'],
-            'assignment_id': data['assignment']['_id'],
-            'pr_link': data['pr_link'],
-            'status_id': valid_result['status'],
+            'student_id': data.get('student', {}).get('_id'),
+            'assignment_id': data.get('assignment', {}).get('_id'),
+            'pr_link': data.get('pr_link'),
+            'status_id': valid_result.get('status'),
         }
         conditions = {
-            'student_id': progress['student_id'],
-            'assignment_id': progress['assignment_id'],
+            'student_id': progress.get('student_id'),
+            'assignment_id': progress.get('assignment_id'),
         }
         student_progress = await crud.progresses.get_one(db, conditions)
         if student_progress is None:
@@ -81,24 +81,24 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
             _ = await crud.progresses.update_one(db, conditions, progress)
     elif validate_type == VALIDATE_TYPES.COMMENT:
         _ = await crud.progresses.update_one(db, {
-            'id': data['progress']['_id']
+            'id': data.get('progress', {}).get('_id')
         }, {
-            'status_id': valid_result['status']
+            'status_id': valid_result.get('status')
         })
     elif validate_type == VALIDATE_TYPES.MERGE:
         _ = await crud.progresses.update_one(db, {
-            'id': data['progress']['_id']
+            'id':  data.get('progress', {}).get('_id')
         }, {
             'status_id': 3,
-            'finished_at': datetime.datetime(data['merged_at'])
+            'finished_at': datetime.datetime(data.get('merged_at'))
         })
     elif validate_type == VALIDATE_TYPES.CLOSED:
         _ = await crud.progresses.update_one(db, {
-            'id': data['progress']['_id']
+            'id': data.get('progress', {}).get('_id')
         }, {
             'status_id': 4,
         })
 
     # 4. post result
     if validate_type == VALIDATE_TYPES.PULL_REQUEST or validate_type == VALIDATE_TYPES.COMMENT:
-        post_comment(uri, valid_result['message'])
+        post_comment(uri, valid_result.get('message'))
