@@ -27,7 +27,9 @@ async def parse_github_payload(db, payload, validate_type):
         base_branch = detail['base']['ref'].lower()
         compare_branch = detail['head']['ref'].lower()
         detail['pr_link'] = payload['pull_request']['html_url']
+        print({'batch': BATCH, 'github_name': detail['user']['login']})
         student = await crud.students.get_one(db, {'batch': BATCH, 'github_name': detail['user']['login']})
+        print(student)
         student_branch = student['name'].lower() + '_develop'
         # 1. check base branch (should be <student_name>_develop)
         if base_branch != student_branch:
