@@ -67,7 +67,7 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
         progress = {
             'student_id': data['student']['_id'],
             'assignment_id': data['assignment']['_id'],
-            'pr_link': data['prLink'],
+            'pr_link': data['pr_link'],
             'status_id': valid_result['status'],
         }
         conditions = {
@@ -90,7 +90,7 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
             'id': data['progress']['_id']
         }, {
             'status_id': 3,
-            'finished_at': datetime.datetime(data['mergedAt'])
+            'finished_at': datetime.datetime(data['merged_at'])
         })
     elif validate_type == VALIDATE_TYPES.CLOSED:
         _ = await crud.progresses.update_one(db, {
