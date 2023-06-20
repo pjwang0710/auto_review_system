@@ -91,7 +91,7 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
             'id':  data.get('progress', {}).get('_id')
         }, {
             'status_id': 3,
-            'finished_at': datetime.datetime(data.get('merged_at'))
+            'finished_at': datetime.datetime.strptime(data.get('merged_at'), '%Y-%m-%dT%H:%M:%SZ')
         })
     elif validate_type == VALIDATE_TYPES.CLOSED:
         _ = await crud.progresses.update_one(db, {
