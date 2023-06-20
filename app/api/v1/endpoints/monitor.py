@@ -65,8 +65,8 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
     print(validate_type)
     if validate_type == VALIDATE_TYPES.PULL_REQUEST:
         progress = {
-            'student_id': data['student']['id'],
-            'assignment_id': data['assignment']['id'],
+            'student_id': data['student']['_id'],
+            'assignment_id': data['assignment']['_id'],
             'pr_link': data['prLink'],
             'status_id': valid_result['status'],
         }
@@ -81,20 +81,20 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
             _ = await crud.progresses.update_one(db, conditions, progress)
     elif validate_type == VALIDATE_TYPES.COMMENT:
         _ = await crud.progresses.update_one(db, {
-            'id': data['progress']['id']
+            'id': data['progress']['_id']
         }, {
             'status_id': valid_result['status']
         })
     elif validate_type == VALIDATE_TYPES.MERGE:
         _ = await crud.progresses.update_one(db, {
-            'id': data['progress']['id']
+            'id': data['progress']['_id']
         }, {
             'status_id': 3,
             'finished_at': datetime.datetime(data['mergedAt'])
         })
     elif validate_type == VALIDATE_TYPES.CLOSED:
         _ = await crud.progresses.update_one(db, {
-            'id': data['progress']['id']
+            'id': data['progress']['_id']
         }, {
             'status_id': 4,
         })
