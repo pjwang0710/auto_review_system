@@ -42,7 +42,8 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
         data = await parse_github_payload(db, payload, validate_type)
         print('payload data:', data)
     except Exception as e:
-        post_comment(uri, str(e))
+        if uri is not None:
+            post_comment(uri, str(e))
         print('parse payload failed:', str(e))
         print('payload:', payload)
         return {
