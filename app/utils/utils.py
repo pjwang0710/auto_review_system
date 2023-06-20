@@ -89,6 +89,6 @@ def code_review(pr_number):
         'Accept': 'application/vnd.github.everest-preview+json',
         'Authorization': f"token {os.getenv('GITHUB_TOKEN')}",
     }
-    body = json.dumps({'event_type': 'code-review', 'pull_request_number': pr_number})
+    body = json.dumps({'event_type': 'code-review', 'client_payload': {'pull_request_number': pr_number}})
     response = requests.post(uri, data=body, headers=headers)
     return response
