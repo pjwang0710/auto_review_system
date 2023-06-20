@@ -5,3 +5,7 @@ from app.data.batch_35 import students, assignments
 def run():
     mongodb.db['students'].insert_many(students)
     mongodb.db['assignments'].insert_many(assignments)
+
+
+if __name__ == '__main__':
+    run()
