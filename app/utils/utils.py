@@ -27,9 +27,7 @@ async def parse_github_payload(db, payload, validate_type):
         base_branch = detail['base']['ref'].lower()
         compare_branch = detail['head']['ref'].lower()
         detail['pr_link'] = payload['pull_request']['html_url']
-        print({'batch': BATCH, 'github_name': detail['user']['login']})
         student = await crud.students.get_one(db, {'batch': BATCH, 'github_name': detail['user']['login']})
-        print(student)
         student_branch = student['name'].lower() + '_develop'
         # 1. check base branch (should be <student_name>_develop)
         if base_branch != student_branch:
@@ -65,11 +63,11 @@ async def parse_github_payload(db, payload, validate_type):
         detail['progress'] = progress
 
     return {
-        'pr_link': detail['pr_link'],
-        'merged_at': detail['merged_at'],
-        'student': detail['student'],
-        'assignment': detail['assignment'],
-        'progress': detail['progress'],
+        'pr_link': detail.get('pr_link'),
+        'merged_at': detail.get('merged_at'),
+        'student': detail.get('student'),
+        'assignment': detail.get('assignment'),
+        'progress': detail.get('progress')
     }
 
 
