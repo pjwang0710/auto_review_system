@@ -42,11 +42,11 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
         data = await parse_github_payload(db, payload, validate_type)
         print('payload data:', data)
     except Exception as e:
-        post_comment(uri, e.message)
-        print('parse payload failed:', e.message)
+        post_comment(uri, str(e))
+        print('parse payload failed:', str(e))
         print('payload:', payload)
         return {
-            'msg': e.message
+            'msg': str(e)
         }
 
     # 2. validate
@@ -56,7 +56,7 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
             valid_result = await validate(data['assignment']['part'], data['student']['server'])
             print("validResult:", valid_result)
     except Exception as e:
-        print('validate failed,:', e.message)
+        print('validate failed,:', str(e))
         return {
             'msg': 'validate failed'
         }
