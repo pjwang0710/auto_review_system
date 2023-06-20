@@ -80,3 +80,15 @@ def post_comment(uri, content):
     body = json.dumps({"body": json.dumps(content)})
     response = requests.post(uri, data=body, headers=headers)
     return response
+
+
+def code_review(pr_number):
+    uri = 'https://api.github.com/repos/AppWorks-School-Materials/Campus-Summer-Back-End/dispatches'
+    print("post comment to uri:", uri)
+    headers = {
+        'Accept': 'application/vnd.github.everest-preview+json',
+        'Authorization': f"token {os.getenv('GITHUB_TOKEN')}",
+    }
+    body = json.dumps({'event_type': 'code-review', 'pull_request_number': pr_number})
+    response = requests.post(uri, data=body, headers=headers)
+    return response
