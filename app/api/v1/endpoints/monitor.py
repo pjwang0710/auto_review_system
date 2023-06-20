@@ -1,7 +1,7 @@
 from app import crud
 from app.db import get_database
 from app.utils.exception import CustomizeException, CustomizeReturn
-from app.utils.utils import VALIDATE_TYPES, parse_github_payload, post_comment
+from app.utils.utils import VALIDATE_TYPES, parse_github_payload, post_comment, code_review
 from app.utils.validate import validate
 
 import datetime
@@ -18,12 +18,14 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
 
     uri = None
     validate_type = None
+    pr_number = None
     if payload.get('action') == 'closed' and not payload.get('pull_request', {}).get('merged_at'):
         validate_type = VALIDATE_TYPES.CLOSED
     elif payload.get('pull_request'):
         if payload.get('pull_request', {}).get('merged_at'):
             validate_type = VALIDATE_TYPES.MERGE
         elif payload.get('action') == 'opened':
+            pr_number = payload.get('pull_request', {}).get('number')
             validate_type = VALIDATE_TYPES.PULL_REQUEST
         uri = payload.get('pull_request', {}).get('issue_url') + '/comments'
     elif payload.get('comment') and payload.get('comment', {}).get('body', '').lower().strip() == 'fixed':
@@ -103,3 +105,5 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
     # 4. post result
     if validate_type == VALIDATE_TYPES.PULL_REQUEST or validate_type == VALIDATE_TYPES.COMMENT:
         post_comment(uri, valid_result.get('message'))
+        print(pr_number)
+        code_review(pr_number)
