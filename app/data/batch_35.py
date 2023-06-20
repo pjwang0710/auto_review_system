@@ -3,15 +3,10 @@ BATCH = 3.5
 students = [
     {
         "batch": BATCH,
-        "name": "pjwang0710",
-        "email": "pjwang0710@gmail.com",
-        "server": "http://54.250.180.147:3000"
-    },
-    {
-        "batch": BATCH,
-        "name": "daniel820710",
+        "name": "pj",
         "email": "daniel820710@gmail.com",
-        "server": ""
+        "github_name": "daniel820710",
+        "server": "http://54.250.180.147:3000"
     },
 ]
 
