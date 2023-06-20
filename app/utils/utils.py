@@ -23,12 +23,12 @@ async def parse_github_payload(db, payload, validate_type):
     BATCH = 3.5
     detail = None
     if validate_type == VALIDATE_TYPES.PULL_REQUEST or validate_type == VALIDATE_TYPES.MERGE or validate_type == VALIDATE_TYPES.CLOSED:
-        detail = payload['pull_request']
-        base_branch = detail['base']['ref'].lower()
-        compare_branch = detail['head']['ref'].lower()
-        detail['pr_link'] = payload['pull_request']['html_url']
+        detail = payload.get('pull_request')
+        base_branch = detail.get('base', {}).get('ref', '').lower()
+        compare_branch = detail.get('head', {}).get('ref', '').lower()
+        detail['pr_link'] = payload.get('pull_request', {}).get('html_url')
         student = await crud.students.get_one(db, {'batch': BATCH, 'github_name': detail['user']['login']})
-        student_branch = student['name'].lower() + '_develop'
+        student_branch = student.get('name', '').lower() + '_develop'
         # 1. check base branch (should be <student_name>_develop)
         if base_branch != student_branch:
             print(f"base branch should be: {student_branch}")
@@ -41,22 +41,22 @@ async def parse_github_payload(db, payload, validate_type):
 
         # 3. get progress when the type is merge
         if validate_type == VALIDATE_TYPES.MERGE or validate_type == VALIDATE_TYPES.CLOSED:
-            progress = await crud.progresses.get_one(db, {'pr_link': detail['pr_link']})
+            progress = await crud.progresses.get_one(db, {'pr_link': detail.get('pr_link')})
             detail['progress'] = progress
 
         detail['student'] = student
         detail['assignment'] = assignment
     elif validate_type == VALIDATE_TYPES.COMMENT:
-        detail = payload['comment']
-        detail['pr_link'] = payload['issue']['html_url']
+        detail = payload.get('comment')
+        detail['pr_link'] = payload.get('issue', {}).get('html_url')
 
         # 1. find progress
-        progress = await crud.progresses.get_one(db, {'pr_link': detail['pr_link']})
+        progress = await crud.progresses.get_one(db, {'pr_link': detail.get('pr_link')})
         if not progress:
             raise ValueError("error: comment on a wrong pull request, note: please contact PJ for this problem")
 
-        student = await crud.students.get_one(db, {'id': progress['student_id']})
-        assignment = await crud.assignments.get_one(db, {'id': progress['assignment_id']})
+        student = await crud.students.get_one(db, {'id': progress.get('student_id')})
+        assignment = await crud.assignments.get_one(db, {'id': progress.get('assignment_id')})
 
         detail['student'] = student
         detail['assignment'] = assignment
