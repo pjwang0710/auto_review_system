@@ -235,12 +235,12 @@ async def validatePart5(server):
         response = signin(server, user1_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
         data1 = check_signin_valid(response, user1_body)
         data2 = check_signin_valid(response, user1_body)
-        res = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}")
+        res = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
         if res['data']['user']['id'] != data1.get('user_id'):
             raise ValueError(f"{res['data']['user']['id']} != {data1.get('user_id')}, input: {data1.get('user_id')}")
         if res['data']['user']['name'] != data1.get('name'):
             raise ValueError(f"{res['data']['user']['name']} != {data1.get('name')}, input: {data1.get('user_id')}")
-        res = get_profile(data2.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data2.get('user_id')}")
+        res = get_profile(data2.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
         if res['data']['user']['id'] != data2.get('user_id'):
             raise ValueError(f"{res['data']['user']['id']} != {data2.get('user_id')}, input: {data2.get('user_id')}")
         if res['data']['user']['name'] != data2.get('name'):
