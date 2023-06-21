@@ -26,59 +26,75 @@ async def validatePart2(server):
 
 
 async def validatePart3(server):
-    api = f'{server}/api/1.0/users/signup'
-    print(api)
+
+    def signup(body, status_code, err_msg):
+        api = f'{server}/api/1.0/users/signup'
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        r = requests.post(api, json=body, headers=headers)
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        
     name = random_string(8)
-    body = {
+    user_body = {
         "name": f"user-{name}",
         "email": f"user-{name}@test.com",
         "password": "test"
     }
-    print()
-    headers = {
-        'Content-Type': 'application/json'
-    }
-    r = requests.post(api, json=body, headers=headers)
-    if r.status_code != 200:
-        return {
-            'status': 2,
-            'message': 'SignUp Failed'
-        }
-    r = requests.post(api, json=body, headers=headers)
-    if r.status_code != 403:
-        return {
-            'status': 2,
-            'message': 'Email Already Exists'
-        }
-    body = {
+    name = random_string(8)
+    wo_password_body = {
         "name": f"user-{name}",
         "email": f"user-{name}@test.com"
     }
-    r = requests.post(api, json=body, headers=headers)
-    if r.status_code != 400:
-        return {
-            'status': 2,
-            'message': 'Password Required'
-        }
-    body = {
+    name = random_string(8)
+    empty_password_body = {
         "name": f"user-{name}",
-        "password": "test"
-    }
-    r = requests.post(api, json=body, headers=headers)
-    if r.status_code != 400:
-        return {
-            'status': 2,
-            'message': 'Email Required'
-        }
-    body = {
         "email": f"user-{name}@test.com",
-        "password": "test"
+        "password": ''
     }
-    r = requests.post(api, json=body, headers=headers)
-    if r.status_code != 400:
+    name = random_string(8)
+    wo_name_body = {
+        "email": f"user-{name}@test.com",
+        "password": 'test'
+    }
+    name = random_string(8)
+    empty_name_body = {
+        "name": "",
+        "email": f"user-{name}@test.com",
+        "password": 'test'
+    }
+    name = random_string(8)
+    wo_email_body = {
+        "name": f"user-{name}",
+        "password": 'test'
+    }
+    name = random_string(8)
+    empty_email_body = {
+        "name": f"user-{name}",
+        "email": "",
+        "password": 'test'
+    }
+    invalid_email_body = {
+        "name": f"user-{name}",
+        "email": "123456798",
+        "password": 'test'
+    }
+    try:
+        signup(user_body, 200, f'SignUp Failed, input: {user_body}')
+        signup(user_body, 403, f'After inputting the same data twice, there was no 403 error thrown. The input data was: {user_body}')
+        signup(wo_password_body, 403, f'Password field was not entered, but no 400 error was thrown. The input data was: {wo_password_body}')
+        signup(wo_name_body, 403, f'Name field was not entered, but no 400 error was thrown. The input data was: {wo_name_body}')
+        signup(wo_email_body, 403, f'Email field was not entered, but no 400 error was thrown. The input data was: {wo_email_body}')
+        signup(empty_password_body, 400, f'Password is empty, but no 400 error was thrown. The input data was: {empty_password_body}')
+        signup(empty_name_body, 400, f'Name is empty, but no 400 error was thrown. The input data was: {empty_name_body}')
+        signup(empty_email_body, 400, f'Email is empty, but no 400 error was thrown. The input data was: {empty_email_body}')
+        signup(invalid_email_body, 400, f'Email is invalid, but no 400 error was thrown. The input data was: {invalid_email_body}')
+
+    except Exception as e:
         return {
             'status': 2,
-            'message': 'Name Required'
+            'message': str(e)
         }
     return {
         'status': 1,
