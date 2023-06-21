@@ -206,7 +206,7 @@ async def validatePart5(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.post(api, headers=headers)
+        r = requests.get(api, headers=headers)
         if r.status_code != status_code:
             raise ValueError(err_msg)
         return r.json()
@@ -236,6 +236,7 @@ async def validatePart5(server):
         data1 = check_signin_valid(response, user1_body)
         data2 = check_signin_valid(response, user1_body)
         res = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
+
         if res['data']['user']['id'] != data1.get('user_id'):
             raise ValueError(f"{res['data']['user']['id']} != {data1.get('user_id')}, input: {data1.get('user_id')}")
         if res['data']['user']['name'] != data1.get('name'):
