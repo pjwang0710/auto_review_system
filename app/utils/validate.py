@@ -233,7 +233,7 @@ async def validatePart5(server):
     def update_picture(token, status_code, err_msg):
         api = f'{server}/api/1.0/users/picture'
         files = {
-            'picture': open('profile.png', 'rb')
+            'picture': open('app/utils/profile.png', 'rb')
         }
         headers = {
             'Content-Type': 'application/json',
