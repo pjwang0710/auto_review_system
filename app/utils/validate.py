@@ -232,9 +232,9 @@ async def validatePart5(server):
 
     def update_picture(token, status_code, err_msg):
         api = f'{server}/api/1.0/users/picture'
-        files = {
-            'picture': open('app/utils/profile.png', 'rb')
-        }
+        files = [
+            ('picture', ('profile.png', open('app/utils/profile.png', 'rb'), 'image/png'))
+        ]
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
@@ -328,8 +328,6 @@ async def validatePart5(server):
         profile = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
         if profile.get('data', {}).get('user', {}).get('picture') == '':
             raise ValueError("Update Picture failed")
-
-
 
     except Exception as e:
         return {
