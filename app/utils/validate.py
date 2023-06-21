@@ -295,7 +295,7 @@ async def validatePart5(server):
         res = update_profile({"name": new_name}, data1.get('token'), 200, f"Update profile failed, input: {{ name: {new_name} }}, jwt: {data1.get('token')}")
         if (res.get('data', {}).get('user', {}).get('id') != data1.get('user_id')):
             raise ValueError(f"Update Profile Response is wrong, {res.get('data', {}).get('user', {}).get('id')} != {data1.get('user_id')}, input: jwt: {data1.get('token')}")
-        profile = get_profile(data1.get('user_id'), data1.get('token'), f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
+        profile = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
         if profile.get('data', {}).get('user', {}).get('name') != new_name:
             raise ValueError(f"Update Profile failed, {profile.get('data', {}).get('user', {}).get('name') } != {new_name}, input: jwt: {data1.get('token')}")
 
@@ -303,7 +303,7 @@ async def validatePart5(server):
         res = update_profile({"introduction": new_introduction}, data1.get('token'), 200, f"Update profile failed, input: {{ introduction: {new_intnew_introductionrodution} }}, jwt: {data1.get('token')}")
         if (res.get('data', {}).get('user', {}).get('id') != data1.get('user_id')):
             raise ValueError(f"Update Profile Response is wrong, {res.get('data', {}).get('user', {}).get('id')} != {data1.get('user_id')}, input: jwt: {data1.get('token')}")
-        profile = get_profile(data1.get('user_id'), data1.get('token'), f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
+        profile = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
         if profile.get('data', {}).get('user', {}).get('introduction') != new_introduction:
             raise ValueError(f"Update Profile failed, {profile.get('data', {}).get('user', {}).get('introduction') } != {new_introduction}, input: jwt: {data1.get('token')}")
 
@@ -311,7 +311,7 @@ async def validatePart5(server):
         res = update_profile({"tags": new_tags}, data1.get('token'), 200, f"Update profile failed, input: {{ tags: {new_tags} }}, jwt: {data1.get('token')}")
         if (res.get('data', {}).get('user', {}).get('id') != data1.get('user_id')):
             raise ValueError(f"Update Profile Response is wrong, {res.get('data', {}).get('user', {}).get('id')} != {data1.get('user_id')}, input: jwt: {data1.get('token')}")
-        profile = get_profile(data1.get('user_id'), data1.get('token'), f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
+        profile = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
         if profile.get('data', {}).get('user', {}).get('tags') != new_tags:
             raise ValueError(f"Update Profile failed, {profile.get('data', {}).get('user', {}).get('tags') } != {new_tags}, input: jwt: {data1.get('token')}")
 
