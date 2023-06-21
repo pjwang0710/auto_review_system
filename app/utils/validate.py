@@ -4,6 +4,52 @@ from app.utils.utils import random_string
 SUCCESS_MESSAGE = "Congrats! You just passed the basic validation." 
 
 
+def check_signin_valid(response, user_body):
+    if 'data' in response.keys():
+        if 'access_token' not in response['data'].keys():
+            raise ValueError(f"Incorrect response, the returned value does not include an access_token. response: {response['data']}")
+        if 'user' not in response['data'].keys():
+            raise ValueError(f"Incorrect response, the returned value does not include an user. response: {response['data']}")
+        else:
+            keys = ['id', 'provider', 'name', 'email', 'picture']
+            for key in keys:
+                if key not in response['data']['user'].keys():
+                    raise ValueError(f"Incorrect response, the returned value does not include an user.{key}. response: {response['data']}")
+            if response['data']['user']['provider'] != 'native':
+                raise ValueError(f"Incorrect response, user.provider != native. response: {response['data']}")
+            if response['data']['user']['name'] != user_body.get('name'):
+                raise ValueError(f"Incorrect response, user.name != {user_body.get('name')}. response: {response['data']}")
+            if response['data']['user']['email'] != user_body.get('email'):
+                raise ValueError(f"Incorrect response, user.email != {user_body.get('email')}. response: {response['data']}")
+    return {
+        'name': response['user']['name'],
+        'user_id': response['user']['id'],
+        'token': response['access_token']
+    }
+
+
+def signup(server, body, status_code, err_msg):
+    api = f'{server}/api/1.0/users/signup'
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    r = requests.post(api, json=body, headers=headers)
+    if r.status_code != status_code:
+        raise ValueError(err_msg)
+    return r.json()
+
+
+def signin(server, body, status_code, err_msg):
+    api = f'{server}/api/1.0/users/signin'
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    r = requests.post(api, json=body, headers=headers)
+    if r.status_code != status_code:
+        raise ValueError(err_msg)
+    return r.json()
+
+
 async def validate(part, server):
     print(f"validate part: {part} server: {server}")
     validator = validators[part-1]
@@ -26,16 +72,6 @@ async def validatePart2(server):
 
 
 async def validatePart3(server):
-
-    def signup(body, status_code, err_msg):
-        api = f'{server}/api/1.0/users/signup'
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        r = requests.post(api, json=body, headers=headers)
-        if r.status_code != status_code:
-            raise ValueError(err_msg)
-        return r.json()
     name = random_string(8)
     user_body = {
         "name": f"user-{name}",
@@ -81,33 +117,16 @@ async def validatePart3(server):
         "password": 'test'
     }
     try:
-        response = signup(user_body, 200, f'SignUp Failed, input: {user_body}')
-
-        if 'data' in response.keys():
-            if 'access_token' not in response['data'].keys():
-                raise ValueError(f"Incorrect response, the returned value does not include an access_token. response: {response['data']}")
-            if 'user' not in response['data'].keys():
-                raise ValueError(f"Incorrect response, the returned value does not include an user. response: {response['data']}")
-            else:
-                keys = ['id', 'provider', 'name', 'email', 'picture']
-                for key in keys:
-                    if key not in response['data']['user'].keys():
-                        raise ValueError(f"Incorrect response, the returned value does not include an user.{key}. response: {response['data']}")
-                if response['data']['user']['provider'] != 'native':
-                    raise ValueError(f"Incorrect response, user.provider != native. response: {response['data']}")
-                if response['data']['user']['name'] != user_body.get('name'):
-                    raise ValueError(f"Incorrect response, user.name != {user_body.get('name')}. response: {response['data']}")
-                if response['data']['user']['email'] != user_body.get('email'):
-                    raise ValueError(f"Incorrect response, user.email != {user_body.get('email')}. response: {response['data']}")
-
-        signup(user_body, 403, f'After inputting the same data twice, there was no 403 error thrown. The input data was: {user_body}')
-        signup(wo_password_body, 400, f'Password field was not entered, but no 400 error was thrown. The input data was: {wo_password_body}')
-        signup(wo_name_body, 400, f'Name field was not entered, but no 400 error was thrown. The input data was: {wo_name_body}')
-        signup(wo_email_body, 400, f'Email field was not entered, but no 400 error was thrown. The input data was: {wo_email_body}')
-        signup(empty_password_body, 400, f'Password is empty, but no 400 error was thrown. The input data was: {empty_password_body}')
-        signup(empty_name_body, 400, f'Name is empty, but no 400 error was thrown. The input data was: {empty_name_body}')
-        signup(empty_email_body, 400, f'Email is empty, but no 400 error was thrown. The input data was: {empty_email_body}')
-        signup(invalid_email_body, 400, f'Email is invalid, but no 400 error was thrown. The input data was: {invalid_email_body}')
+        response = signup(server, user_body, 200, f'SignUp Failed, input: {user_body}')
+        check_signin_valid(response, user_body)
+        signup(server, user_body, 403, f'After inputting the same data twice, there was no 403 error thrown. The input data was: {user_body}')
+        signup(server, wo_password_body, 400, f'Password field was not entered, but no 400 error was thrown. The input data was: {wo_password_body}')
+        signup(server, wo_name_body, 400, f'Name field was not entered, but no 400 error was thrown. The input data was: {wo_name_body}')
+        signup(server, wo_email_body, 400, f'Email field was not entered, but no 400 error was thrown. The input data was: {wo_email_body}')
+        signup(server, empty_password_body, 400, f'Password is empty, but no 400 error was thrown. The input data was: {empty_password_body}')
+        signup(server, empty_name_body, 400, f'Name is empty, but no 400 error was thrown. The input data was: {empty_name_body}')
+        signup(server, empty_email_body, 400, f'Email is empty, but no 400 error was thrown. The input data was: {empty_email_body}')
+        signup(server, invalid_email_body, 400, f'Email is invalid, but no 400 error was thrown. The input data was: {invalid_email_body}')
 
     except Exception as e:
         return {
@@ -121,27 +140,6 @@ async def validatePart3(server):
 
 
 async def validatePart4(server):
-
-    def signup(body, status_code, err_msg):
-        api = f'{server}/api/1.0/users/signup'
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        r = requests.post(api, json=body, headers=headers)
-        if r.status_code != status_code:
-            raise ValueError(err_msg)
-        return r.json()
-
-    def signin(body, status_code, err_msg):
-        api = f'{server}/api/1.0/users/signin'
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        r = requests.post(api, json=body, headers=headers)
-        if r.status_code != status_code:
-            raise ValueError(err_msg)
-        return r.json()
-
     name = random_string(8)
     user_body = {
         "name": f"user-{name}",
@@ -181,31 +179,74 @@ async def validatePart4(server):
         "email": f"user-{name}@test.com"
     }
     try:
-        signup(user_body, 200, f'SignUp Failed, input: {user_body}')
-        response = signin(user_signin_body, 200, f'SignIn Failed, input: {user_signin_body}')
-        if 'data' in response.keys():
-            if 'access_token' not in response['data'].keys():
-                raise ValueError(f"Incorrect response, the returned value does not include an access_token. response: {response['data']}")
-            if 'user' not in response['data'].keys():
-                raise ValueError(f"Incorrect response, the returned value does not include an user. response: {response['data']}")
-            else:
-                keys = ['id', 'provider', 'name', 'email', 'picture']
-                for key in keys:
-                    if key not in response['data']['user'].keys():
-                        raise ValueError(f"Incorrect response, the returned value does not include an user.{key}. response: {response['data']}")
-                if response['data']['user']['provider'] != 'native':
-                    raise ValueError(f"Incorrect response, user.provider != native. response: {response['data']}")
-                if response['data']['user']['name'] != user_body.get('name'):
-                    raise ValueError(f"Incorrect response, user.name != {user_signin_body.get('name')}. response: {response['data']}")
-                if response['data']['user']['email'] != user_signin_body.get('email'):
-                    raise ValueError(f"Incorrect response, user.email != {user_signin_body.get('email')}. response: {response['data']}")
+        signup(server, user_body, 200, f'SignUp Failed, input: {user_body}')
+        response = signin(server, user_signin_body, 200, f'SignIn Failed, input: {user_signin_body}')
+        check_signin_valid(response, user_body)
+        signin(server, wrong_provider_body, 403, f'Wrong provider, but did not respond with a 403 error, input: {wrong_provider_body}')
+        signin(server, wrong_email_body, 403, f'Wrong email, but did not respond with a 403 error, input: {wrong_email_body}')
+        signin(server, wrong_password_body, 403, f'Wrong password, but did not respond with a 403 error, input: {wrong_password_body}')
+        signin(server, wo_provider_body, 400, f'No provider provided, but did not respond with a 400 error, input: {wo_provider_body}')
+        signin(server, wo_email_body, 400, f'No email provided, but did not respond with a 400 error, input: {wo_email_body}')
+        signin(server, wo_password_body, 400, f'No password provided, but did not respond with a 400 error, input: {wo_password_body}')        
+    except Exception as e:
+        return {
+            'status': 2,
+            'message': str(e)
+        }
+    return {
+        'status': 1,
+        'message': SUCCESS_MESSAGE
+    }
 
-        signin(wrong_provider_body, 403, f'Wrong provider, but did not respond with a 403 error, input: {wrong_provider_body}')
-        signin(wrong_email_body, 403, f'Wrong email, but did not respond with a 403 error, input: {wrong_email_body}')
-        signin(wrong_password_body, 403, f'Wrong password, but did not respond with a 403 error, input: {wrong_password_body}')
-        signin(wo_provider_body, 400, f'No provider provided, but did not respond with a 400 error, input: {wo_provider_body}')
-        signin(wo_email_body, 400, f'No email provided, but did not respond with a 400 error, input: {wo_email_body}')
-        signin(wo_password_body, 400, f'No password provided, but did not respond with a 400 error, input: {wo_password_body}')        
+
+async def validatePart5(server):
+    def get_profile(user_id, token, status_code, err_msg):
+        api = f'{server}/api/1.0/users/{user_id}/profile'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        r = requests.post(api, headers=headers)
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        return r.json()
+
+    name = random_string(8)
+    user1_body = {
+        "name": f"user-{name}",
+        "email": f"user-{name}@test.com",
+        "password": "test"
+    }
+    user1_signin_body = {
+        "provider": "native",
+        "email": f"user-{name}@test.com",
+        "password": "test"
+    }
+    name = random_string(8)
+    user2_body = {
+        "name": f"user-{name}",
+        "email": f"user-{name}@test.com",
+        "password": "test"
+    }
+
+    try:
+        signup(server, user1_body, 200, f'SignUp Failed, input: {user1_body}')
+        signup(server, user2_body, 200, f'SignUp Failed, input: {user2_body}')
+        response = signin(server, user1_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
+        data1 = check_signin_valid(response, user1_body)
+        data2 = check_signin_valid(response, user1_body)
+        res = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}")
+        if res['user']['id'] != data1.get('user_id'):
+            raise ValueError(f"{res['user']['id']} != {data1.get('user_id')}, input: {data1.get('user_id')}")
+        if res['user']['name'] != data1.get('name'):
+            raise ValueError(f"{res['user']['name']} != {data1.get('name')}, input: {data1.get('user_id')}")
+        res = get_profile(data2.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data2.get('user_id')}")
+        if res['user']['id'] != data2.get('user_id'):
+            raise ValueError(f"{res['user']['id']} != {data2.get('user_id')}, input: {data2.get('user_id')}")
+        if res['user']['name'] != data2.get('name'):
+            raise ValueError(f"{res['user']['name']} != {data2.get('name')}, input: {data2.get('user_id')}")
+        get_profile(data2.get('user_id'), None, 401, "No token provided, but did not respond with a 401 error.")
+        get_profile(data2.get('user_id'), '123', 403, "Wrong token provided, but did not respond with a 403 error.")
     except Exception as e:
         return {
             'status': 2,
@@ -220,5 +261,6 @@ validators = [
     validatePart1,
     validatePart2,
     validatePart3,
-    validatePart4
+    validatePart4,
+    validatePart5,
 ]
