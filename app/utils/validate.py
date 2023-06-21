@@ -1,7 +1,7 @@
 import requests
 from app.utils.utils import random_string
 
-SUCCESS_MESSAGE = "Congrats! You just passed the basic validation. PJ is on the way." 
+SUCCESS_MESSAGE = "Congrats! You just passed the basic validation." 
 
 
 async def validate(part, server):
