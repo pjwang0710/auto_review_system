@@ -110,9 +110,9 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
         suggestions = []
         for commit in commits:
             for file in commit.get('file_meta'):
-                if 'package-lock' in file.get('path') or 'package' in file.get('path') or 'node_modules' in file.get('path'):
+                if not file.get('path').endswith(".js"):
                     continue
                 patch = file.get('patch')
                 reviews = code_review(patch)
-                suggestions.append(f"[ChatGPT]<br />filename: {file.get('path')} <br />suggestion: {reviews.get('suggestion')} <br />event: {reviews.get('event')}")
-        post_comment(uri, "<br /><br />".join(suggestions))
+                suggestions.append(f"filename: {file.get('path')} <br />suggestion: {reviews.get('suggestion')} <br />event: {reviews.get('event')}")
+        post_comment(uri, "[ChatGPT]<br />" + "<br /><br />".join(suggestions))
