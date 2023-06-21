@@ -219,5 +219,6 @@ async def validatePart4(server):
 validators = [
     validatePart1,
     validatePart2,
-    validatePart3
+    validatePart3,
+    validatePart4
 ]
