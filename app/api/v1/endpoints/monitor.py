@@ -119,4 +119,7 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
                 reviews = code_review(patch)
                 suggestions.append(f"filename: {file.get('path')} <br />suggestion: {reviews.get('suggestion')} <br />event: {reviews.get('event')}")
                 seen[file.get('path')] = True
-        post_comment(uri, "[ChatGPT]<br />" + "<br /><br />".join(suggestions))
+        if suggestions == []:
+            post_comment(uri, "[ChatGPT]<br /> .js file was not detected.")
+        else:    
+            post_comment(uri, "[ChatGPT]<br />" + "<br /><br />".join(suggestions))
