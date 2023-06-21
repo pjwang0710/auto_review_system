@@ -82,6 +82,55 @@ def post_comment(uri, content):
     return response
 
 
+def get_commits(pr_number):
+    uri = f'https://api.github.com/repos/AppWorks-School-Materials/Campus-Summer-Back-End/pulls/{pr_number}/commits'
+    print("get commits to uri:", uri)
+    headers = {
+        'Accept': 'application/vnd.github.everest-preview+json',
+        'Authorization': f"token {os.getenv('GITHUB_TOKEN')}",
+    }
+    response = requests.get(uri, headers=headers)
+    commits = response.json()
+    data = []
+    for commit in commits:
+        sha = commit.get('sha')
+        uri = f'https://api.github.com/repos/AppWorks-School-Materials/Campus-Summer-Back-End/commits/{sha}'
+        print("get commit", uri)
+        headers = {
+            'Accept': 'application/vnd.github.everest-preview+json',
+            'Authorization': f"token {os.getenv('GITHUB_TOKEN')}",
+        }
+        response = requests.get(uri, headers=headers)
+        files = response.json().get('files')
+        file_meta = []
+        for file in files:
+            file_meta.append({
+                'path': file.get('filename'),
+                'patch': file.get('patch')
+            })
+        data.append({
+            'commit_id': sha,
+            'file_meta': file_meta
+        })
+    return data
+
+
+def create_review(pr_number, commit_id, all_suggestion, event, comments):
+    uri = f'https://api.github.com/repos/AppWorks-School-Materials/Campus-Summer-Back-End/pulls/{pr_number}/reviews'
+    headers = {
+        'Accept': 'application/vnd.github.everest-preview+json',
+        'Authorization': f"token {os.getenv('GITHUB_TOKEN')}",
+    }
+    body = {
+        'commit_id': commit_id,
+        'body': all_suggestion,
+        'event': event,
+        'comments': comments
+    }
+    raw_body = json.dumps(body)
+    response = requests.post(uri, data=raw_body, headers=headers)
+    return response.json()
+
 def code_review(pr_number):
     uri = 'https://api.github.com/repos/AppWorks-School-Materials/Campus-Summer-Back-End/dispatches'
     print("post comment to uri:", uri)
@@ -91,4 +140,4 @@ def code_review(pr_number):
     }
     body = json.dumps({'event_type': 'code-review', 'client_payload': {'pull_request_number': pr_number}})
     response = requests.post(uri, data=body, headers=headers)
-    return response
+    return response.json()

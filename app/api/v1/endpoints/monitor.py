@@ -1,7 +1,7 @@
 from app import crud
 from app.db import get_database
 from app.utils.exception import CustomizeException, CustomizeReturn
-from app.utils.utils import VALIDATE_TYPES, parse_github_payload, post_comment, code_review
+from app.utils.utils import VALIDATE_TYPES, parse_github_payload, post_comment, code_review, get_commits
 from app.utils.validate import validate
 
 import datetime
@@ -106,4 +106,5 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
     if validate_type == VALIDATE_TYPES.PULL_REQUEST or validate_type == VALIDATE_TYPES.COMMENT:
         post_comment(uri, valid_result.get('message'))
         print(pr_number)
-        code_review(pr_number)
+        commits = get_commits(pr_number)
+        print(commits)
