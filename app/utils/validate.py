@@ -35,7 +35,7 @@ async def validatePart3(server):
         r = requests.post(api, json=body, headers=headers)
         if r.status_code != status_code:
             raise ValueError(err_msg)
-        
+        return r.json()
     name = random_string(8)
     user_body = {
         "name": f"user-{name}",
@@ -81,7 +81,25 @@ async def validatePart3(server):
         "password": 'test'
     }
     try:
-        signup(user_body, 200, f'SignUp Failed, input: {user_body}')
+        response = signup(user_body, 200, f'SignUp Failed, input: {user_body}')
+
+        if 'data' in response.keys():
+            if 'access_token' not in response['data'].keys():
+                raise ValueError(f"Incorrect response, the returned value does not include an access_token. response: {response['data']}")
+            if 'user' not in response['data'].keys():
+                raise ValueError(f"Incorrect response, the returned value does not include an user. response: {response['data']}")
+            else:
+                keys = ['id', 'provider', 'name', 'email', 'picture']
+                for key in keys:
+                    if key not in response['data']['user'].keys():
+                        raise ValueError(f"Incorrect response, the returned value does not include an user.{key}. response: {response['data']}")
+                if response['data']['user']['provider'] != 'native':
+                    raise ValueError(f"Incorrect response, user.provider != native. response: {response['data']}")
+                if response['data']['user']['name'] != user_body.get('name'):
+                    raise ValueError(f"Incorrect response, user.name != {user_body.get('name')}. response: {response['data']}")
+                if response['data']['user']['email'] != user_body.get('email'):
+                    raise ValueError(f"Incorrect response, user.email != {user_body.get('email')}. response: {response['data']}")
+
         signup(user_body, 403, f'After inputting the same data twice, there was no 403 error thrown. The input data was: {user_body}')
         signup(wo_password_body, 400, f'Password field was not entered, but no 400 error was thrown. The input data was: {wo_password_body}')
         signup(wo_name_body, 400, f'Name field was not entered, but no 400 error was thrown. The input data was: {wo_name_body}')
