@@ -113,5 +113,5 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
             for file in commit.get('file_meta'):
                 patch = file.get('patch')
                 reviews = code_review(patch)
-                suggestions.append(f"filename: {file.get('filename')} \nsuggestion: {reviews.get('suggestion')} \nevent: {reviews.get('event')}")
+                suggestions.append(f"[ChatGPT]\r\nfilename: {file.get('path')} \r\nsuggestion: {reviews.get('suggestion')} \r\nevent: {reviews.get('event')}")
         post_comment(uri, "\n\n".join(suggestions))
