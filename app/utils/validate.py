@@ -38,13 +38,13 @@ async def validatePart3(server):
     headers = {
         'Content-Type': 'application/json'
     }
-    r = requests.post(api, data=body, headers=headers)
+    r = requests.post(api, json=body, headers=headers)
     if r.status_code != 200:
         return {
             'status': 2,
             'message': 'SignUp Failed'
         }
-    r = requests.post(api, data=body, headers=headers)
+    r = requests.post(api, json=body, headers=headers)
     if r.status_code != 403:
         return {
             'status': 2,
@@ -54,7 +54,7 @@ async def validatePart3(server):
         "name": f"user-{name}",
         "email": f"user-{name}@test.com"
     }
-    r = requests.post(api, data=body, headers=headers)
+    r = requests.post(api, json=body, headers=headers)
     if r.status_code != 400:
         return {
             'status': 2,
@@ -64,7 +64,7 @@ async def validatePart3(server):
         "name": f"user-{name}",
         "password": "test"
     }
-    r = requests.post(api, data=body, headers=headers)
+    r = requests.post(api, json=body, headers=headers)
     if r.status_code != 400:
         return {
             'status': 2,
@@ -74,7 +74,7 @@ async def validatePart3(server):
         "email": f"user-{name}@test.com",
         "password": "test"
     }
-    r = requests.post(api, data=body, headers=headers)
+    r = requests.post(api, json=body, headers=headers)
     if r.status_code != 400:
         return {
             'status': 2,
