@@ -164,7 +164,7 @@ def code_review(code_change):
         }
     ]
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-0613",
+        model="gpt-3.5-turbo-16k",
         messages=messages,
         functions=functions,
         function_call="auto",

@@ -105,12 +105,13 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
     # 4. post result
     if validate_type == VALIDATE_TYPES.PULL_REQUEST or validate_type == VALIDATE_TYPES.COMMENT:
         post_comment(uri, valid_result.get('message'))
-        print(pr_number)
         commits = get_commits(pr_number)
 
         suggestions = []
         for commit in commits:
             for file in commit.get('file_meta'):
+                if 'package-lock' in file.get('path') or 'package' in file.get('path') or 'node_modules' in file.get('path'):
+                    continue
                 patch = file.get('patch')
                 reviews = code_review(patch)
                 suggestions.append(f"[ChatGPT]<br />filename: {file.get('path')} <br />suggestion: {reviews.get('suggestion')} <br />event: {reviews.get('event')}")
