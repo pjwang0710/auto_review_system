@@ -22,9 +22,9 @@ def check_signin_valid(response, user_body):
             if response['data']['user']['email'] != user_body.get('email'):
                 raise ValueError(f"Incorrect response, user.email != {user_body.get('email')}. response: {response['data']}")
     return {
-        'name': response['user']['name'],
-        'user_id': response['user']['id'],
-        'token': response['access_token']
+        'name': response['data']['user']['name'],
+        'user_id': response['data']['user']['id'],
+        'token': response['data']['access_token']
     }
 
 
