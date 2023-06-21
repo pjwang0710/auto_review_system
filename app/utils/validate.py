@@ -225,7 +225,7 @@ async def validatePart5(server):
         }
         r = requests.put(api, json=body, headers=headers)
         if r.status_code == 404:
-            raise ValueError(f'GET {api} not found')
+            raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
             raise ValueError(err_msg)
         return r.json()
@@ -249,7 +249,7 @@ async def validatePart5(server):
         }
         r = requests.put(api, json=body, headers=headers)
         if r.status_code == 404:
-            raise ValueError(f'GET {api} not found')
+            raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
             raise ValueError(err_msg)
         return r.json()
@@ -291,29 +291,21 @@ async def validatePart5(server):
         get_profile_wo_headers(data2.get('user_id'), 401, "No token provided, but did not respond with a 401 error.")
         get_profile(data2.get('user_id'), '123', 403, "Wrong token provided, but did not respond with a 403 error.")
 
-        new_name = f'user-{random_string(8)}'
-        res = update_profile({"name": new_name}, data1.get('token'), 200, f"Update profile failed, input: {{ name: {new_name} }}, jwt: {data1.get('token')}")
+        body = {
+            "name": f'user-{random_string(8)}',
+            "introduction": random_string(64),
+            "tags": f'{random_string(6)},{random_string(6)},{random_string(6)}'
+        }
+        res = update_profile(body, data1.get('token'), 200, f"Update profile failed, input: {body}, jwt: {data1.get('token')}")
         if (res.get('data', {}).get('user', {}).get('id') != data1.get('user_id')):
             raise ValueError(f"Update Profile Response is wrong, {res.get('data', {}).get('user', {}).get('id')} != {data1.get('user_id')}, input: jwt: {data1.get('token')}")
         profile = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
-        if profile.get('data', {}).get('user', {}).get('name') != new_name:
-            raise ValueError(f"Update Profile failed, {profile.get('data', {}).get('user', {}).get('name') } != {new_name}, input: jwt: {data1.get('token')}")
-
-        new_introduction = random_string(64)
-        res = update_profile({"introduction": new_introduction}, data1.get('token'), 200, f"Update profile failed, input: {{ introduction: {new_introduction} }}, jwt: {data1.get('token')}")
-        if (res.get('data', {}).get('user', {}).get('id') != data1.get('user_id')):
-            raise ValueError(f"Update Profile Response is wrong, {res.get('data', {}).get('user', {}).get('id')} != {data1.get('user_id')}, input: jwt: {data1.get('token')}")
-        profile = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
-        if profile.get('data', {}).get('user', {}).get('introduction') != new_introduction:
-            raise ValueError(f"Update Profile failed, {profile.get('data', {}).get('user', {}).get('introduction') } != {new_introduction}, input: jwt: {data1.get('token')}")
-
-        new_tags = f'{random_string(6)},{random_string(6)},{random_string(6)}'
-        res = update_profile({"tags": new_tags}, data1.get('token'), 200, f"Update profile failed, input: {{ tags: {new_tags} }}, jwt: {data1.get('token')}")
-        if (res.get('data', {}).get('user', {}).get('id') != data1.get('user_id')):
-            raise ValueError(f"Update Profile Response is wrong, {res.get('data', {}).get('user', {}).get('id')} != {data1.get('user_id')}, input: jwt: {data1.get('token')}")
-        profile = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
-        if profile.get('data', {}).get('user', {}).get('tags') != new_tags:
-            raise ValueError(f"Update Profile failed, {profile.get('data', {}).get('user', {}).get('tags') } != {new_tags}, input: jwt: {data1.get('token')}")
+        if profile.get('data', {}).get('user', {}).get('name') != body.get('name'):
+            raise ValueError(f"Update Profile failed, {profile.get('data', {}).get('user', {}).get('name') } != {body.get('name')}, input: jwt: {data1.get('token')}")
+        if profile.get('data', {}).get('user', {}).get('introduction') != body.get('introduction'):
+            raise ValueError(f"Update Profile failed, {profile.get('data', {}).get('user', {}).get('introduction') } != {body.get('introduction')}, input: jwt: {data1.get('token')}")
+        if profile.get('data', {}).get('user', {}).get('tags') != body.get('tags'):
+            raise ValueError(f"Update Profile failed, {profile.get('data', {}).get('user', {}).get('tags') } != {body.get('tags')}, input: jwt: {data1.get('token')}")
 
     except Exception as e:
         return {
