@@ -230,6 +230,22 @@ async def validatePart5(server):
             raise ValueError(err_msg)
         return r.json()
 
+    def update_picture(token, status_code, err_msg):
+        api = f'{server}/api/1.0/users/picture'
+        files = {
+            'picture': open('profile.png', 'rb')
+        }
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        r = requests.put(api, files=files, headers=headers)
+        if r.status_code == 404:
+            raise ValueError(f'PUT {api} not found')
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        return r.json()
+
     def get_profile_wo_headers(user_id, status_code, err_msg):
         api = f'{server}/api/1.0/users/{user_id}/profile'
         headers = {
@@ -253,7 +269,7 @@ async def validatePart5(server):
         if r.status_code != status_code:
             raise ValueError(err_msg)
         return r.json()
-    
+
     name = random_string(8)
     user1_body = {
         "name": f"user-{name}",
@@ -306,6 +322,14 @@ async def validatePart5(server):
             raise ValueError(f"Update Profile failed, {profile.get('data', {}).get('user', {}).get('introduction') } != {body.get('introduction')}, input: jwt: {data1.get('token')}")
         if profile.get('data', {}).get('user', {}).get('tags') != body.get('tags'):
             raise ValueError(f"Update Profile failed, {profile.get('data', {}).get('user', {}).get('tags') } != {body.get('tags')}, input: jwt: {data1.get('token')}")
+        update_profile_wo_token(body, 401, "No token provided, but did not respond with a 401 error.")
+        update_profile(body, '123', 403, "Wrong token provided, but did not respond with a 403 error.")
+        update_picture(data1.get('token'), 200, 'Picture upload failed, image here: https://www.flaticon.com/free-icon/profile_3135715?term=user&page=1&position=7&origin=search&related_id=3135715')
+        profile = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
+        if profile.get('data', {}).get('user', {}).get('picture') == '':
+            raise ValueError("Update Picture failed")
+
+
 
     except Exception as e:
         return {
