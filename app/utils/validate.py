@@ -240,7 +240,7 @@ async def validatePart5(server):
             'Authorization': f'Bearer {token}'
         }
         r = requests.put(api, files=files, headers=headers)
-        print(r.status_code, r.json())
+        print(r.status_code, r.content)
         if r.status_code == 404:
             raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
