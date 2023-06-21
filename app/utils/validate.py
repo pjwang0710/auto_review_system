@@ -83,9 +83,9 @@ async def validatePart3(server):
     try:
         signup(user_body, 200, f'SignUp Failed, input: {user_body}')
         signup(user_body, 403, f'After inputting the same data twice, there was no 403 error thrown. The input data was: {user_body}')
-        signup(wo_password_body, 403, f'Password field was not entered, but no 400 error was thrown. The input data was: {wo_password_body}')
-        signup(wo_name_body, 403, f'Name field was not entered, but no 400 error was thrown. The input data was: {wo_name_body}')
-        signup(wo_email_body, 403, f'Email field was not entered, but no 400 error was thrown. The input data was: {wo_email_body}')
+        signup(wo_password_body, 400, f'Password field was not entered, but no 400 error was thrown. The input data was: {wo_password_body}')
+        signup(wo_name_body, 400, f'Name field was not entered, but no 400 error was thrown. The input data was: {wo_name_body}')
+        signup(wo_email_body, 400, f'Email field was not entered, but no 400 error was thrown. The input data was: {wo_email_body}')
         signup(empty_password_body, 400, f'Password is empty, but no 400 error was thrown. The input data was: {empty_password_body}')
         signup(empty_name_body, 400, f'Name is empty, but no 400 error was thrown. The input data was: {empty_name_body}')
         signup(empty_email_body, 400, f'Email is empty, but no 400 error was thrown. The input data was: {empty_email_body}')
