@@ -203,9 +203,9 @@ async def validatePart4(server):
         signin(wrong_provider_body, 403, f'Wrong provider, but did not respond with a 403 error, input: {wrong_provider_body}')
         signin(wrong_email_body, 403, f'Wrong email, but did not respond with a 403 error, input: {wrong_email_body}')
         signin(wrong_password_body, 403, f'Wrong password, but did not respond with a 403 error, input: {wrong_password_body}')
-        signin(wo_provider_body, 403, f'No provider provided, but did not respond with a 403 error, input: {wo_provider_body}')
-        signin(wo_email_body, 403, f'No email provided, but did not respond with a 403 error, input: {wo_email_body}')
-        signin(wo_password_body, 403, f'No password provided, but did not respond with a 403 error, input: {wo_password_body}')        
+        signin(wo_provider_body, 400, f'No provider provided, but did not respond with a 400 error, input: {wo_provider_body}')
+        signin(wo_email_body, 400, f'No email provided, but did not respond with a 400 error, input: {wo_email_body}')
+        signin(wo_password_body, 400, f'No password provided, but did not respond with a 400 error, input: {wo_password_body}')        
     except Exception as e:
         return {
             'status': 2,
