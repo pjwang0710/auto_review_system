@@ -210,6 +210,16 @@ async def validatePart5(server):
         if r.status_code != status_code:
             raise ValueError(err_msg)
         return r.json()
+    
+    def get_profile_wo_headers(user_id, status_code, err_msg):
+        api = f'{server}/api/1.0/users/{user_id}/profile'
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        r = requests.get(api, headers=headers)
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        return r.json()
 
     name = random_string(8)
     user1_body = {
@@ -236,7 +246,6 @@ async def validatePart5(server):
         data1 = check_signin_valid(response, user1_body)
         data2 = check_signin_valid(response, user1_body)
         res = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
-
         if res['data']['user']['id'] != data1.get('user_id'):
             raise ValueError(f"{res['data']['user']['id']} != {data1.get('user_id')}, input: {data1.get('user_id')}")
         if res['data']['user']['name'] != data1.get('name'):
@@ -246,7 +255,7 @@ async def validatePart5(server):
             raise ValueError(f"{res['data']['user']['id']} != {data2.get('user_id')}, input: {data2.get('user_id')}")
         if res['data']['user']['name'] != data2.get('name'):
             raise ValueError(f"{res['data']['user']['name']} != {data2.get('name')}, input: {data2.get('user_id')}")
-        get_profile(data2.get('user_id'), None, 401, "No token provided, but did not respond with a 401 error.")
+        get_profile_wo_headers(data2.get('user_id'), 401, "No token provided, but did not respond with a 401 error.")
         get_profile(data2.get('user_id'), '123', 403, "Wrong token provided, but did not respond with a 403 error.")
     except Exception as e:
         return {
