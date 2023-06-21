@@ -236,7 +236,6 @@ async def validatePart5(server):
             ('picture', ('profile.png', open('app/utils/profile.png', 'rb'), 'image/png'))
         ]
         headers = {
-            'Content-Type': 'multipart/form-data',
             'Authorization': f'Bearer {token}'
         }
         r = requests.put(api, files=files, headers=headers)
