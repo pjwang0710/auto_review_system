@@ -107,4 +107,11 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
         post_comment(uri, valid_result.get('message'))
         print(pr_number)
         commits = get_commits(pr_number)
-        print(commits)
+
+        suggestions = []
+        for commit in commits:
+            for file in commit.get('file_meta'):
+                patch = file.get('patch')
+                reviews = code_review(patch)
+                suggestions.append(f"filename: {file.get('filename')} \nsuggestion: {reviews.get('suggestion')} \nevent: {reviews.get('event')}")
+        post_comment(uri, "\n\n".join(suggestions))

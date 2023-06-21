@@ -4,6 +4,7 @@ import json
 import requests
 import random
 import string
+import openai
 
 
 class VALIDATE_TYPES:
@@ -131,13 +132,54 @@ def create_review(pr_number, commit_id, all_suggestion, event, comments):
     response = requests.post(uri, data=raw_body, headers=headers)
     return response.json()
 
-def code_review(pr_number):
-    uri = 'https://api.github.com/repos/AppWorks-School-Materials/Campus-Summer-Back-End/dispatches'
-    print("post comment to uri:", uri)
-    headers = {
-        'Accept': 'application/vnd.github.everest-preview+json',
-        'Authorization': f"token {os.getenv('GITHUB_TOKEN')}",
-    }
-    body = json.dumps({'event_type': 'code-review', 'client_payload': {'pull_request_number': pr_number}})
-    response = requests.post(uri, data=body, headers=headers)
-    return response.json()
+
+def code_review(code_change):
+    openai.api_key = os.getenv('OPENAI_API_KEY')
+    messages = [{
+        "role": "user", "content": f"""
+            Evaluate the given code change on github
+            '''{code_change} '''
+            Please provide guidance and suggestions in a constructive manner, without directly giving the code and answers. Also, assess whether the submitted code passes the evaluation.
+        """
+    }]
+    functions = [
+        {
+            "name": "code_review",
+            "description": "Give some suggestion for these code change on github",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "suggestion": {
+                        "type": "string",
+                        "description": "Provide suggestions for the code change."
+                    },
+                    "event": {
+                        "type": "string",
+                        "enum": ["APPROVE", "REQUEST_CHANGES", "COMMENT"],
+                        "description": "Options for whether the current commit can pass"
+                    }
+                },
+                "required": ["suggestion", "event"],
+            },
+        }
+    ]
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo-0613",
+        messages=messages,
+        functions=functions,
+        function_call="auto",
+    )
+    response_message = response["choices"][0]["message"]
+    return json.loads(response_message["function_call"]["arguments"])
+
+
+# def code_review(pr_number):
+#     uri = 'https://api.github.com/repos/AppWorks-School-Materials/Campus-Summer-Back-End/dispatches'
+#     print("post comment to uri:", uri)
+#     headers = {
+#         'Accept': 'application/vnd.github.everest-preview+json',
+#         'Authorization': f"token {os.getenv('GITHUB_TOKEN')}",
+#     }
+#     body = json.dumps({'event_type': 'code-review', 'client_payload': {'pull_request_number': pr_number}})
+#     response = requests.post(uri, data=body, headers=headers)
+#     return response.json()
