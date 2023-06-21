@@ -195,7 +195,7 @@ async def validatePart4(server):
                         raise ValueError(f"Incorrect response, the returned value does not include an user.{key}. response: {response['data']}")
                 if response['data']['user']['provider'] != 'native':
                     raise ValueError(f"Incorrect response, user.provider != native. response: {response['data']}")
-                if response['data']['user']['name'] != user_signin_body.get('name'):
+                if response['data']['user']['name'] != user_body.get('name'):
                     raise ValueError(f"Incorrect response, user.name != {user_signin_body.get('name')}. response: {response['data']}")
                 if response['data']['user']['email'] != user_signin_body.get('email'):
                     raise ValueError(f"Incorrect response, user.email != {user_signin_body.get('email')}. response: {response['data']}")
