@@ -471,12 +471,12 @@ async def validatePart8(server):
         print(data1)
         print(data2)
         print(user2_events)
-        if user2_events['data']['events'][0]['user_id'] != data1.get('user_id'):
+        if user2_events['data']['events'][0]['requested_user_id'] != data1.get('user_id'):
             raise ValueError(f"After user1 sent a friend request, user2 did not receive any notification, user1_id: {data1.get('user_id')}, user2_id: {data2.get('user_id')}")
 
         send_friend_request_agree(server, friendship_id, data2.get('token'), 200, f"Agree Friend Request Error, {data2.get('user_id')} can agree this friend requset, but failed")
         user1_events = get_events(data1.get('token'), 200, f"Get events failed, jwt: {data1.get('token')}")
-        if user1_events['data']['events'][0]['user_id'] != data2.get('user_id'):
+        if user1_events['data']['events'][0]['accepted_user_id'] != data2.get('user_id'):
             raise ValueError(f"After user2 accepted the friend request, user1 did not receive any notification, user1_id: {data1.get('user_id')}, user2_id: {data2.get('user_id')}")
 
     except Exception as e:
