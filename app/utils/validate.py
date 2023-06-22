@@ -366,6 +366,7 @@ async def validatePart6(server):
             'Authorization': f'Bearer {token}'
         }
         r = requests.post(api, headers=headers)
+        print(r.text)
         if r.status_code == 404:
             raise ValueError(f'POST {api} not found')
         if r.status_code != status_code:
@@ -403,6 +404,7 @@ async def validatePart6(server):
         data2 = check_signin_valid(response, user2_body)
         response = send_friend_request(data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
+        print(friendship_id, data1.get('user_id'))
         send_friend_request_agree(friendship_id, data1.get('user_id'), 400, f"user_id: {data1.get('user_id')} cannot agree this friend request")
         send_friend_request_agree(friendship_id, data2.get('user_id'), 200, f"user_id: {data2.get('user_id')} cannot agree this friend request")
     except Exception as e:
