@@ -453,6 +453,19 @@ async def validatePart8(server):
             raise ValueError(err_msg)
         return r.json()
 
+    def read_event(event_id, token, status_code, err_msg):
+        api = f'{server}/api/1.0/events/{event_id}/read'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        r = requests.put(api, headers=headers)
+        if r.status_code == 404:
+            raise ValueError(f'PUT {api} not found')
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        return r.json()
+
     user1_body, user1_signin_body = get_new_user()
     user2_body, user2_signin_body = get_new_user()
     try:
@@ -466,11 +479,8 @@ async def validatePart8(server):
         # Test send create friendship
         response = send_friend_request(server, data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
-        
+
         user2_events = get_events(data2.get('token'), 200, f"Get events failed, jwt: {data2.get('token')}")
-        print(data1)
-        print(data2)
-        print(user2_events)
         if user2_events['data']['events'][0]['user_id'] != data1.get('user_id'):
             raise ValueError(f"After user1 sent a friend request, user2 did not receive any notification, user1_id: {data1.get('user_id')}, user2_id: {data2.get('user_id')}")
 
@@ -478,6 +488,12 @@ async def validatePart8(server):
         user1_events = get_events(data1.get('token'), 200, f"Get events failed, jwt: {data1.get('token')}")
         if user1_events['data']['events'][0]['user_id'] != data2.get('user_id'):
             raise ValueError(f"After user2 accepted the friend request, user1 did not receive any notification, user1_id: {data1.get('user_id')}, user2_id: {data2.get('user_id')}")
+
+        event_id = user1_events['data']['events'][0]['id']
+        read_event(event_id, data1.get('token'), 200, f"Read event failed, event_id: {event_id}, jwt: {data1.get('token')}")
+        user1_events = get_events(data1.get('token'), 200, f"Get events failed, jwt: {data1.get('token')}")
+        if user1_events['data']['events'][0]['read'] != True:
+            raise ValueError(f"After sending the read event, event.read remains false. {user1_events['data']['events']}")
 
     except Exception as e:
         return {
