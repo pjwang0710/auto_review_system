@@ -463,28 +463,17 @@ async def validatePart8(server):
         response = signin(server, user2_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
         data2 = check_signin_valid(response, user2_body)
 
-        user1_events = get_events(data1.get('token'), 200, f"Get events failed, jwt: {data1.get('token')}")
-        user2_events = get_events(data2.get('token'), 200, f"Get events failed, jwt: {data2.get('token')}")
-        user1_events_count = len(user1_events)
-        user2_events_count = len(user2_events)
-
         # Test send create friendship
         response = send_friend_request(server, data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
 
-        new_user2_events = get_events(data2.get('token'), 200, f"Get events failed, jwt: {data2.get('token')}")
-        new_user2_events_count = len(new_user2_events)
-        print(new_user2_events_count)
-        print(user2_events_count)
-        print(data2.get('token'))
-        if new_user2_events_count - user2_events_count != 1:
+        user2_events = get_events(data2.get('token'), 200, f"Get events failed, jwt: {data2.get('token')}")
+        if user2_events['data']['events'][0]['user_id'] != data1.get('user_id'):
             raise ValueError(f"After user1 sent a friend request, user2 did not receive any notification, user1_id: {data1.get('user_id')}, user2_id: {data2.get('user_id')}")
 
         send_friend_request_agree(server, friendship_id, data2.get('token'), 200, f"Agree Friend Request Error, {data2.get('user_id')} can agree this friend requset, but failed")
-        new_user1_events = get_events(data1.get('token'), 200, f"Get events failed, jwt: {data1.get('token')}")
-        new_user1_events_count = len(new_user1_events)
-
-        if new_user1_events_count - user1_events_count != 1:
+        user1_events = get_events(data1.get('token'), 200, f"Get events failed, jwt: {data1.get('token')}")
+        if user1_events['data']['events'][0]['user_id'] != data2.get('user_id'):
             raise ValueError(f"After user2 accepted the friend request, user1 did not receive any notification, user1_id: {data1.get('user_id')}, user2_id: {data2.get('user_id')}")
 
     except Exception as e:
