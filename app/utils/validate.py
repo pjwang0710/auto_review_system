@@ -492,8 +492,8 @@ async def validatePart8(server):
         event_id = user1_events['data']['events'][0]['id']
         read_event(event_id, data1.get('token'), 200, f"Read event failed, event_id: {event_id}, jwt: {data1.get('token')}")
         user1_events = get_events(data1.get('token'), 200, f"Get events failed, jwt: {data1.get('token')}")
-        if user1_events['data']['events'][0]['read'] != True:
-            raise ValueError(f"After sending the read event, event.read remains false. {user1_events['data']['events']}")
+        if user1_events['data']['events'][0]['is_read'] is not True:
+            raise ValueError(f"After sending the read event, event.is_read remains false. {user1_events['data']['events']}")
 
     except Exception as e:
         return {
