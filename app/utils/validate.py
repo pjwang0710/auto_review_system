@@ -466,8 +466,11 @@ async def validatePart8(server):
         # Test send create friendship
         response = send_friend_request(server, data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
-
+        
         user2_events = get_events(data2.get('token'), 200, f"Get events failed, jwt: {data2.get('token')}")
+        print(data1)
+        print(data2)
+        print(user2_events)
         if user2_events['data']['events'][0]['user_id'] != data1.get('user_id'):
             raise ValueError(f"After user1 sent a friend request, user2 did not receive any notification, user1_id: {data1.get('user_id')}, user2_id: {data2.get('user_id')}")
 
