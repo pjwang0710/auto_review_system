@@ -446,7 +446,7 @@ async def validatePart8(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.post(api, headers=headers)
+        r = requests.get(api, headers=headers)
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
