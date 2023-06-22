@@ -357,21 +357,7 @@ async def validatePart6(server):
             raise ValueError(f'POST {api} not found')
         if r.status_code != status_code:
             raise ValueError(err_msg)
-        return r.json()        
-    
-    def send_friend_request_agree(friendship_id, token, status_code, err_msg):
-        api = f'{server}/api/1.0/friends/{friendship_id}/agree'
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {token}'
-        }
-        r = requests.post(api, headers=headers)
-        print(r.text)
-        if r.status_code == 404:
-            raise ValueError(f'POST {api} not found')
-        if r.status_code != status_code:
-            raise ValueError(err_msg)
-        return r.json()        
+        return r.json()
 
     name = random_string(8)
     user1_body = {
@@ -403,9 +389,110 @@ async def validatePart6(server):
         response = signin(server, user2_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
         data2 = check_signin_valid(response, user2_body)
         response = send_friend_request(data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
+    except Exception as e:
+        return {
+            'status': 2,
+            'message': str(e)
+        }
+    return {
+        'status': 1,
+        'message': SUCCESS_MESSAGE
+    }
+
+
+async def validatePart7(server):
+    def send_friend_request(user_id, token, status_code, err_msg):
+        api = f'{server}/api/1.0/friends/{user_id}/request'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        r = requests.post(api, headers=headers)
+        if r.status_code == 404:
+            raise ValueError(f'POST {api} not found')
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        return r.json()
+
+    def send_friend_request_agree(friendship_id, token, status_code, err_msg):
+        api = f'{server}/api/1.0/friends/{friendship_id}/agree'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        r = requests.post(api, headers=headers)
+        print(r.text)
+        if r.status_code == 404:
+            raise ValueError(f'POST {api} not found')
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        return r.json()
+
+    def delete_friend(friendship_id, token, status_code, err_msg):
+        api = f'{server}/api/1.0/friends/{friendship_id}'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        r = requests.delete(api, headers=headers)
+        if r.status_code == 404:
+            raise ValueError(f'POST {api} not found')
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        return r.json()
+
+    name = random_string(8)
+    user1_body = {
+        "name": f"user-{name}",
+        "email": f"user-{name}@test.com",
+        "password": "test"
+    }
+    user1_signin_body = {
+        "provider": "native",
+        "email": f"user-{name}@test.com",
+        "password": "test"
+    }
+    name = random_string(8)
+    user2_body = {
+        "name": f"user-{name}",
+        "email": f"user-{name}@test.com",
+        "password": "test"
+    }
+    user2_signin_body = {
+        "provider": "native",
+        "email": f"user-{name}@test.com",
+        "password": "test"
+    }
+    try:
+        signup(server, user1_body, 200, f'SignUp Failed, input: {user1_body}')
+        signup(server, user2_body, 200, f'SignUp Failed, input: {user2_body}')
+        response = signin(server, user1_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
+        data1 = check_signin_valid(response, user1_body)
+        response = signin(server, user2_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
+        data2 = check_signin_valid(response, user2_body)
+
+        # Test send create friendship
+        response = send_friend_request(data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
+
+        # Test agree with being friend
         send_friend_request_agree(friendship_id, data1.get('token'), 401, f"Agree Friend Request Error, {data2.get('user_id')} can agree this requset, but {data1.get('user_id')} cannot.You have to return error: 400")
         send_friend_request_agree(friendship_id, data2.get('token'), 200, f"Agree Friend Request Error, {data2.get('user_id')} can agree this friend requset, but failed")
+
+        # user1 test delete friend 
+        delete_friend(friendship_id, data1.get('token'), 200, f"User1 Cannot delete friend, friendship_id: {friendship_id}, jwt: {data1.get('token')}")
+
+        # user1 test delete friend before being friend
+        response = send_friend_request(data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
+        friendship_id = response.get('data', {}).get('friendship', {}).get('id')
+        delete_friend(friendship_id, data1.get('token'), 200, f"User1 Cannot delete friend, friendship_id: {friendship_id}, jwt: {data1.get('token')}")
+
+        # user2 test delete friend
+        response = send_friend_request(data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
+        friendship_id = response.get('data', {}).get('friendship', {}).get('id')
+        send_friend_request_agree(friendship_id, data2.get('token'), 200, f"Agree Friend Request Error, {data2.get('user_id')} can agree this friend requset, but failed")
+        delete_friend(friendship_id, data2.get('token'), 200, f"User2 Cannot delete friend, friendship_id: {friendship_id}, jwt: {data2.get('token')}")
+
     except Exception as e:
         return {
             'status': 2,
@@ -423,5 +510,6 @@ validators = [
     validatePart3,
     validatePart4,
     validatePart5,
-    validatePart6
+    validatePart6,
+    validatePart7
 ]
