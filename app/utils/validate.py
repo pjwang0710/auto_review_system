@@ -287,12 +287,17 @@ async def validatePart5(server):
         "email": f"user-{name}@test.com",
         "password": "test"
     }
-
+    user2_signin_body = {
+        "provider": "native",
+        "email": f"user-{name}@test.com",
+        "password": "test"
+    }
     try:
         signup(server, user1_body, 200, f'SignUp Failed, input: {user1_body}')
         signup(server, user2_body, 200, f'SignUp Failed, input: {user2_body}')
         response = signin(server, user1_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
         data1 = check_signin_valid(response, user1_body)
+        response = signin(server, user2_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
         data2 = check_signin_valid(response, user2_body)
         res = get_profile(data1.get('user_id'), data1.get('token'), 200, f"Get profile error, user_id: {data1.get('user_id')}, jwt: {data1.get('token')}")
         if res['data']['user']['id'] != data1.get('user_id'):
@@ -384,11 +389,17 @@ async def validatePart6(server):
         "email": f"user-{name}@test.com",
         "password": "test"
     }
+    user2_signin_body = {
+        "provider": "native",
+        "email": f"user-{name}@test.com",
+        "password": "test"
+    }
     try:
         signup(server, user1_body, 200, f'SignUp Failed, input: {user1_body}')
         signup(server, user2_body, 200, f'SignUp Failed, input: {user2_body}')
         response = signin(server, user1_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
         data1 = check_signin_valid(response, user1_body)
+        response = signin(server, user2_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
         data2 = check_signin_valid(response, user2_body)
         response = send_friend_request(data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
