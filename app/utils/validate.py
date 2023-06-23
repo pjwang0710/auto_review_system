@@ -844,12 +844,14 @@ async def validatePart13(server):
         create_post(server, 'test post 09', data1.get('token'), 200, f"Cannot create post, context: test post 09, jwt: {data1.get('token')}")
         create_post(server, 'test post 10', data1.get('token'), 200, f"Cannot create post, context: test post 10, jwt: {data1.get('token')}")
         create_post(server, 'test post 11', data1.get('token'), 200, f"Cannot create post, context: test post 11, jwt: {data1.get('token')}")
+        create_post(server, 'test post 12', data1.get('token'), 200, f"Cannot create post, context: test post 12, jwt: {data1.get('token')}")
 
         # user1
         data = search_posts(data1['token'], '', 200, f"[User1] Search post failed, jwt: {data1['token']}")
         print(data)
         cursor = data['data']['next_cursor']
         posts = data['data']['posts']
+        print(len(posts), cursor)
         if (cursor == None):
             raise ValueError(f"cursor is null, response: {data}")
         if (len(posts) != 10):
