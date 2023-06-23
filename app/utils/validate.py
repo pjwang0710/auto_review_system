@@ -512,7 +512,7 @@ async def validatePart9(server):
         headers = {
             'Content-Type': 'application/json'
         }
-        r = requests.post(api, headers=headers)
+        r = requests.get(api, headers=headers)
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
@@ -534,12 +534,14 @@ async def validatePart9(server):
         response = send_friend_request(server, data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
         send_friend_request_agree(server, friendship_id, data2.get('token'), 200, f"Agree Friend Request Error, {data2.get('user_id')} can agree this friend requset, but failed")
-        
+
         data = search_users(user2_body.get('name'), 200, f"Get user failed, input: {user2_body.get('name')}")
+        print(data)
         if (data['users'][0]['friendship']['id'] != friendship_id):
             raise ValueError(f"Get user\'s data without friendship id. response: {data}, and friendship id: {friendship_id}")
         
         data = search_users(user3_body.get('name'), 200, f"Get user failed, input: {user3_body.get('name')}")
+        print(data)
         if (data['users'][0]['friendship'] != None):
             raise ValueError(f"Get user\'s data error. response: {data}")    
 
