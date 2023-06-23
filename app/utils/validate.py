@@ -54,6 +54,23 @@ def signin(server, body, status_code, err_msg):
     return r.json()
 
 
+def create_post(server, context, token, status_code, err_msg):
+    api = f'{server}/api/1.0/posts/'
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {token}'
+    }
+    body = {
+        'context': context
+    }
+    r = requests.post(api, json=body, headers=headers)
+    if r.status_code == 404:
+        raise ValueError(f'POST {api} not found')
+    if r.status_code != status_code:
+        raise ValueError(err_msg)
+    return r.json()
+
+
 def send_friend_request(server, user_id, token, status_code, err_msg):
     api = f'{server}/api/1.0/friends/{user_id}/request'
     headers = {
@@ -539,14 +556,56 @@ async def validatePart9(server):
         send_friend_request_agree(server, friendship_id, data2.get('token'), 200, f"Agree Friend Request Error, {data2.get('user_id')} can agree this friend requset, but failed")
 
         data = search_users(user2_body.get('name'), data1.get('token'), 200, f"Get user failed, input: {user2_body.get('name')}, jwt: {data1.get('token')}")
-        print(data)
         if (data['data']['users'][0]['friendship']['id'] != friendship_id):
             raise ValueError(f"Get user\'s data without friendship id. response: {data}, and friendship id: {friendship_id}")
 
         data = search_users(user3_body.get('name'), data1.get('token'), 200, f"Get user failed, input: {user3_body.get('name')}, jwt: {data1.get('token')}")
-        print(data)
         if (data['data']['users'][0]['friendship'] != None):
             raise ValueError(f"Get user\'s data error. response: {data}")
+
+    except Exception as e:
+        return {
+            'status': 2,
+            'message': str(e)
+        }
+    return {
+        'status': 1,
+        'message': SUCCESS_MESSAGE
+    }
+
+
+async def validatePart10(server):
+    def edit_post(post_id, context, token, status_code, err_msg):
+        api = f'{server}/api/1.0/posts/{post_id}'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        body = {
+            'context': context
+        }
+        r = requests.put(api, json=body, headers=headers)
+        if r.status_code == 404:
+            raise ValueError(f'PUT {api} not found')
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        return r.json()
+        
+    user1_body, user1_signin_body = get_new_user()
+    try:
+        signup(server, user1_body, 200, f'SignUp Failed, input: {user1_body}')
+        response = signin(server, user1_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
+        data1 = check_signin_valid(response, user1_body)
+
+        data = create_post(server, 'test post 01', data1.get('token'), 200, f"Cannot create post, context: test post 01, jwt: {data1.get('token')}")
+        print(data)
+        post_id = data.get('data', {}).get('post', {}).get('id')
+        if not post_id:
+            raise ValueError('Post id is null')
+        
+        data = edit_post(post_id, 'edited test post 01', data1.get('token'), 200, f"Update post failed, post_id: {post_id}, context: edited test post 01, jwt: {data1.get('token')}")
+        print(data)
+        post_id = data.get('data', {}).get('post', {}).get('id')
 
     except Exception as e:
         return {
@@ -569,4 +628,5 @@ validators = [
     validatePart7,
     validatePart8,
     validatePart9,
+    validatePart10
 ]
