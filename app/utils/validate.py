@@ -739,6 +739,7 @@ async def validatePart12(server):
 
         data = get_post_detail(post_id, data1.get('token'), 200, f"Get post failed, post_id: {post_id}, jwt: {data1.get('token')}")
         post = data['data']['post']
+        print(post)
         if (post['id'] != post_id):
             raise ValueError(f"The post_ids are different. Original post_id: {post_id}, Response post_id: {post['id']}.")
 
