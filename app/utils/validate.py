@@ -882,6 +882,56 @@ async def validatePart13(server):
         'message': SUCCESS_MESSAGE
     }
 
+
+async def validatePart14(server):
+    return {
+        'status': 1,
+        'message': SUCCESS_MESSAGE
+    }
+
+
+async def validatePart15(server):
+    return {
+        'status': 1,
+        'message': SUCCESS_MESSAGE
+    }
+
+
+async def validatePart16(server):
+    return {
+        'status': 1,
+        'message': SUCCESS_MESSAGE
+    }
+
+
+async def validatePart17(server):
+    return {
+        'status': 1,
+        'message': SUCCESS_MESSAGE
+    }
+
+
+async def validatePart18(server):
+    return {
+        'status': 1,
+        'message': SUCCESS_MESSAGE
+    }
+
+
+async def validatePart19(server):
+    return {
+        'status': 1,
+        'message': SUCCESS_MESSAGE
+    }
+
+
+async def validatePart20(server):
+    return {
+        'status': 1,
+        'message': SUCCESS_MESSAGE
+    }
+
+
 validators = [
     validatePart1,
     validatePart2,
@@ -895,5 +945,12 @@ validators = [
     validatePart10,
     validatePart11,
     validatePart12,
-    validatePart13
+    validatePart13,
+    validatePart14,
+    validatePart15,
+    validatePart16,
+    validatePart17,
+    validatePart18,
+    validatePart19,
+    validatePart20
 ]
