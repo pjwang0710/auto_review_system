@@ -797,7 +797,7 @@ async def validatePart13(server):
         # user1
         data = search_posts(data1['token'], '', 200, f"[User1] Search post failed, jwt: {data1['token']}")
         print(data)
-        cursor = data['data']['cursor']
+        cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor != None):
             raise ValueError(f"cursor is not null, response: {data}")
@@ -807,7 +807,7 @@ async def validatePart13(server):
         # user2's feed (user1's friend)
         data = search_posts(data2['token'], '', 200, f"[User2] Search post failed, jwt: {data2['token']}")
         print(data)
-        cursor = data['data']['cursor']
+        cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor != None):
             raise ValueError(f"cursor is not null, response: {data}")
@@ -817,7 +817,7 @@ async def validatePart13(server):
         # user1's post lists
         data = search_posts(data2['token'], f"?user_id={data1.get('user_id')}", 200, f"[User2] Search post failed, user_id: {data1.get('user_id')}, jwt: {data2['token']}")
         print(data)
-        cursor = data['data']['cursor']
+        cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor != None):
             raise ValueError(f"cursor is not null, user_id: {data1.get('user_id')}, response: {data}")
@@ -827,7 +827,7 @@ async def validatePart13(server):
         # user3's feed
         data = search_posts(data3['token'], '', 200, f"[User3] Search post failed, jwt: {data3['token']}")
         print(data)
-        cursor = data['data']['cursor']
+        cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor != None):
             raise ValueError(f"cursor is not null, response: {data}")
@@ -848,7 +848,7 @@ async def validatePart13(server):
         # user1
         data = search_posts(data1['token'], '', 200, f"[User1] Search post failed, jwt: {data1['token']}")
         print(data)
-        cursor = data['data']['cursor']
+        cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor == None):
             raise ValueError(f"cursor is null, response: {data}")
@@ -856,7 +856,7 @@ async def validatePart13(server):
             raise ValueError(f"length of posts != 10, response: {data}")
 
         data = search_posts(data1['token'], f"?cursor={cursor}", 200, f"[User1] Search post failed, cursor: {cursor}, jwt: {data1['token']}")
-        cursor = data['data']['cursor']
+        cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor != None):
             raise ValueError(f"cursor is not null, response: {data}")
@@ -866,7 +866,7 @@ async def validatePart13(server):
         # user2
         data = search_posts(data2['token'], f"?user_id={data1['user_id']}", 200, f"[User1] Search post failed, user_id: {data1['user_id']}, jwt: {data2['token']}")
         print(data)
-        cursor = data['data']['cursor']
+        cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor == None):
             raise ValueError(f"cursor is null, response: {data}")
@@ -874,7 +874,7 @@ async def validatePart13(server):
             raise ValueError(f"length of posts != 10, response: {data}")
 
         data = search_posts(data2['token'], f"?user_id={data1['user_id']}&cursor={cursor}", 200, f"[User1] Search post failed, user_id: {data1['user_id']},  cursor: {cursor}, jwt: {data2['token']}")
-        cursor = data['data']['cursor']
+        cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor != None):
             raise ValueError(f"cursor is not null, response: {data}")
