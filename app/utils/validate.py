@@ -618,6 +618,71 @@ async def validatePart10(server):
     }
 
 
+async def validatePart11(server):
+    def create_like(post_id, token, status_code, err_msg):
+        api = f'{server}/api/1.0/posts/{post_id}/like'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        r = requests.post(api, headers=headers)
+        if r.status_code == 404:
+            raise ValueError(f'POST {api} not found')
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        return r.json()
+
+    def create_comment(post_id, body, token, status_code, err_msg):
+        api = f'{server}/api/1.0/posts/{post_id}/comment'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        r = requests.post(api, json=body, headers=headers)
+        if r.status_code == 404:
+            raise ValueError(f'POST {api} not found')
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        return r.json()
+
+    def delete_like(post_id, token, status_code, err_msg):
+        api = f'{server}/api/1.0/posts/{post_id}/like'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        r = requests.delete(api, headers=headers)
+        if r.status_code == 404:
+            raise ValueError(f'POST {api} not found')
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        return r.json()
+
+    user1_body, user1_signin_body = get_new_user()
+    try:
+        signup(server, user1_body, 200, f'SignUp Failed, input: {user1_body}')
+        response = signin(server, user1_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
+        data1 = check_signin_valid(response, user1_body)
+
+        data = create_post(server, 'test post 01', data1.get('token'), 200, f"Cannot create post, context: test post 01, jwt: {data1.get('token')}")
+        post_id = data.get('data', {}).get('post', {}).get('id')
+        if not post_id:
+            raise ValueError('Post id is null')
+        create_like(post_id, data1.get('token'), 200, f"Create like failed, post_id: {post_id}, jwt: {data1.get('token')}")
+        create_comment(post_id, {'content': 'test comment'}, data1.get('token'), 200, f"Create comment failed, post_id: {post_id}, body: {{'content': 'test comment'}}, jwt: {data1.get('token')}")
+        delete_like(post_id, data1.get('token'), 200, f"Delete like failed, post_id: {post_id}, jwt: {data1.get('token')}")
+
+    except Exception as e:
+        return {
+            'status': 2,
+            'message': str(e)
+        }
+    return {
+        'status': 1,
+        'message': SUCCESS_MESSAGE
+    }
+
+
 validators = [
     validatePart1,
     validatePart2,
@@ -628,5 +693,6 @@ validators = [
     validatePart7,
     validatePart8,
     validatePart9,
-    validatePart10
+    validatePart10,
+    validatePart11
 ]
