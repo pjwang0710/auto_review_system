@@ -99,54 +99,5 @@ assignments = [
         'name': 'week_3_part_3',
         'route': '/',
         'deadline': '2023-07-19'
-    },
-    {
-        'batch': BATCH,
-        'part': 14,
-        'name': 'week_3_part_4',
-        'route': '/',
-        'deadline': '2023-07-20'
-    },
-    {
-        'batch': BATCH,
-        'part': 15,
-        'name': 'week_3_part_5',
-        'route': '/',
-        'deadline': '2023-07-21'
-    },
-    {
-        'batch': BATCH,
-        'part': 16,
-        'name': 'week_4_part_1',
-        'route': '/',
-        'deadline': '2023-07-24'
-    },
-    {
-        'batch': BATCH,
-        'part': 17,
-        'name': 'week_4_part_2',
-        'route': '/',
-        'deadline': '2023-07-25'
-    },
-    {
-        'batch': BATCH,
-        'part': 18,
-        'name': 'week_4_part_3',
-        'route': '/',
-        'deadline': '2023-07-26'
-    },
-    {
-        'batch': BATCH,
-        'part': 19,
-        'name': 'week_4_part_4',
-        'route': '/',
-        'deadline': '2023-07-27'
-    },
-    {
-        'batch': BATCH,
-        'part': 20,
-        'name': 'week_4_part_5',
-        'route': '/',
-        'deadline': '2023-07-28'
     }
 ]
