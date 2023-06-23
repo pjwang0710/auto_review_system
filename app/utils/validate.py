@@ -527,6 +527,7 @@ async def validatePart9(server):
     try:
         signup(server, user1_body, 200, f'SignUp Failed, input: {user1_body}')
         signup(server, user2_body, 200, f'SignUp Failed, input: {user2_body}')
+        signup(server, user3_body, 200, f'SignUp Failed, input: {user3_body}')
         response = signin(server, user1_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
         data1 = check_signin_valid(response, user1_body)
         response = signin(server, user2_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
@@ -541,11 +542,11 @@ async def validatePart9(server):
         print(data)
         if (data['data']['users'][0]['friendship']['id'] != friendship_id):
             raise ValueError(f"Get user\'s data without friendship id. response: {data}, and friendship id: {friendship_id}")
-        
+
         data = search_users(user3_body.get('name'), data1.get('token'), 200, f"Get user failed, input: {user3_body.get('name')}, jwt: {data1.get('token')}")
         print(data)
         if (data['data']['users'][0]['friendship'] != None):
-            raise ValueError(f"Get user\'s data error. response: {data}")    
+            raise ValueError(f"Get user\'s data error. response: {data}")
 
     except Exception as e:
         return {
