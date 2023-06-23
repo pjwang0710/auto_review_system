@@ -537,12 +537,12 @@ async def validatePart9(server):
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
         send_friend_request_agree(server, friendship_id, data2.get('token'), 200, f"Agree Friend Request Error, {data2.get('user_id')} can agree this friend requset, but failed")
 
-        data = search_users(user2_body.get('name'), user1_signin_body.get('token'), 200, f"Get user failed, input: {user2_body.get('name')}, jwt: {user1_signin_body.get('token')}")
+        data = search_users(user2_body.get('name'), data1.get('token'), 200, f"Get user failed, input: {user2_body.get('name')}, jwt: {data1.get('token')}")
         print(data)
         if (data['users'][0]['friendship']['id'] != friendship_id):
             raise ValueError(f"Get user\'s data without friendship id. response: {data}, and friendship id: {friendship_id}")
         
-        data = search_users(user3_body.get('name'), user1_signin_body.get('token'), 200, f"Get user failed, input: {user3_body.get('name')}, jwt: {user1_signin_body.get('token')}")
+        data = search_users(user3_body.get('name'), data1.get('token'), 200, f"Get user failed, input: {user3_body.get('name')}, jwt: {data1.get('token')}")
         print(data)
         if (data['users'][0]['friendship'] != None):
             raise ValueError(f"Get user\'s data error. response: {data}")    
