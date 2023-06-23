@@ -759,6 +759,138 @@ async def validatePart12(server):
         'message': SUCCESS_MESSAGE
     }
 
+
+async def validatePart13(server):
+    def search_posts(token, conditions, status_code, err_msg):
+        api = f'{server}/api/1.0/posts/search{conditions}'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        r = requests.get(api, headers=headers)
+        if r.status_code == 404:
+            raise ValueError(f'GET {api} not found')
+        if r.status_code != status_code:
+            raise ValueError(err_msg)
+        return r.json()
+
+    user1_body, user1_signin_body = get_new_user()
+    user2_body, user2_signin_body = get_new_user()
+    user3_body, user3_signin_body = get_new_user()
+    try:
+        signup(server, user1_body, 200, f'SignUp Failed, input: {user1_body}')
+        signup(server, user2_body, 200, f'SignUp Failed, input: {user2_body}')
+        signup(server, user3_body, 200, f'SignUp Failed, input: {user3_body}')
+        response = signin(server, user1_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
+        data1 = check_signin_valid(response, user1_body)
+        response = signin(server, user2_signin_body, 200, f'SignIn Failed, input: {user2_signin_body}')
+        data2 = check_signin_valid(response, user2_body)
+        response = signin(server, user3_signin_body, 200, f'SignIn Failed, input: {user3_signin_body}')
+        data3 = check_signin_valid(response, user3_body)
+
+        # Test send create friendship
+        response = send_friend_request(server, data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
+        friendship_id = response.get('data', {}).get('friendship', {}).get('id')
+        send_friend_request_agree(server, friendship_id, data2.get('token'), 200, f"Agree Friend Request Error, {data2.get('user_id')} can agree this friend requset, but failed")
+
+        create_post(server, 'test post 01', data1.get('token'), 200, f"Cannot create post, context: test post 01, jwt: {data1.get('token')}")
+        # user1
+        data = search_posts(data1['token'], '', 200, f"[User1] Search post failed, jwt: {data1['token']}")
+        print(data)
+        cursor = data['data']['cursor']
+        posts = data['data']['posts']
+        if (cursor != None):
+            raise ValueError(f"cursor is not null, response: {data}")
+        if (len(posts) != 1):
+            raise ValueError(f"length of posts != 1, response: {data}")
+
+        # user2's feed (user1's friend)
+        data = search_posts(data2['token'], '', 200, f"[User2] Search post failed, jwt: {data2['token']}")
+        print(data)
+        cursor = data['data']['cursor']
+        posts = data['data']['posts']
+        if (cursor != None):
+            raise ValueError(f"cursor is not null, response: {data}")
+        if (len(posts) != 1):
+            raise ValueError(f"length of posts != 1, response: {data}")
+
+        # user1's post lists
+        data = search_posts(data2['token'], f"?user_id={data1.get('user_id')}", 200, f"[User2] Search post failed, user_id: {data1.get('user_id')}, jwt: {data2['token']}")
+        print(data)
+        cursor = data['data']['cursor']
+        posts = data['data']['posts']
+        if (cursor != None):
+            raise ValueError(f"cursor is not null, user_id: {data1.get('user_id')}, response: {data}")
+        if (len(posts) != 1):
+            raise ValueError(f"length of posts != 1, user_id: {data1.get('user_id')}, response: {data}")
+
+        # user3's feed
+        data = search_posts(data3['token'], '', 200, f"[User3] Search post failed, jwt: {data3['token']}")
+        print(data)
+        cursor = data['data']['cursor']
+        posts = data['data']['posts']
+        if (cursor != None):
+            raise ValueError(f"cursor is not null, response: {data}")
+        if (len(posts) != 0):
+            raise ValueError(f"length of posts != 0, response: {data}")
+
+        create_post(server, 'test post 02', data1.get('token'), 200, f"Cannot create post, context: test post 02, jwt: {data1.get('token')}")
+        create_post(server, 'test post 03', data1.get('token'), 200, f"Cannot create post, context: test post 03, jwt: {data1.get('token')}")
+        create_post(server, 'test post 04', data1.get('token'), 200, f"Cannot create post, context: test post 04, jwt: {data1.get('token')}")
+        create_post(server, 'test post 05', data1.get('token'), 200, f"Cannot create post, context: test post 05, jwt: {data1.get('token')}")
+        create_post(server, 'test post 06', data1.get('token'), 200, f"Cannot create post, context: test post 06, jwt: {data1.get('token')}")
+        create_post(server, 'test post 07', data1.get('token'), 200, f"Cannot create post, context: test post 07, jwt: {data1.get('token')}")
+        create_post(server, 'test post 08', data1.get('token'), 200, f"Cannot create post, context: test post 08, jwt: {data1.get('token')}")
+        create_post(server, 'test post 09', data1.get('token'), 200, f"Cannot create post, context: test post 09, jwt: {data1.get('token')}")
+        create_post(server, 'test post 10', data1.get('token'), 200, f"Cannot create post, context: test post 10, jwt: {data1.get('token')}")
+        create_post(server, 'test post 11', data1.get('token'), 200, f"Cannot create post, context: test post 11, jwt: {data1.get('token')}")
+
+        # user1
+        data = search_posts(data1['token'], '', 200, f"[User1] Search post failed, jwt: {data1['token']}")
+        print(data)
+        cursor = data['data']['cursor']
+        posts = data['data']['posts']
+        if (cursor == None):
+            raise ValueError(f"cursor is null, response: {data}")
+        if (len(posts) != 10):
+            raise ValueError(f"length of posts != 10, response: {data}")
+
+        data = search_posts(data1['token'], f"?cursor={cursor}", 200, f"[User1] Search post failed, cursor: {cursor}, jwt: {data1['token']}")
+        cursor = data['data']['cursor']
+        posts = data['data']['posts']
+        if (cursor != None):
+            raise ValueError(f"cursor is not null, response: {data}")
+        if (len(posts) != 1):
+            raise ValueError(f"length of posts != 1, response: {data}")
+
+        # user2
+        data = search_posts(data2['token'], f"?user_id={data1['user_id']}", 200, f"[User1] Search post failed, user_id: {data1['user_id']}, jwt: {data2['token']}")
+        print(data)
+        cursor = data['data']['cursor']
+        posts = data['data']['posts']
+        if (cursor == None):
+            raise ValueError(f"cursor is null, response: {data}")
+        if (len(posts) != 10):
+            raise ValueError(f"length of posts != 10, response: {data}")
+
+        data = search_posts(data2['token'], f"?user_id={data1['user_id']}&cursor={cursor}", 200, f"[User1] Search post failed, user_id: {data1['user_id']},  cursor: {cursor}, jwt: {data2['token']}")
+        cursor = data['data']['cursor']
+        posts = data['data']['posts']
+        if (cursor != None):
+            raise ValueError(f"cursor is not null, response: {data}")
+        if (len(posts) != 1):
+            raise ValueError(f"length of posts != 1, response: {data}")
+
+    except Exception as e:
+        return {
+            'status': 2,
+            'message': str(e)
+        }
+    return {
+        'status': 1,
+        'message': SUCCESS_MESSAGE
+    }
+
 validators = [
     validatePart1,
     validatePart2,
@@ -771,5 +903,6 @@ validators = [
     validatePart9,
     validatePart10,
     validatePart11,
-    validatePart12
+    validatePart12,
+    validatePart13
 ]
