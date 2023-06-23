@@ -512,7 +512,7 @@ async def validatePart9(server):
         headers = {
             'Content-Type': 'application/json'
         }
-        r = requests.post(api, headers=headers)
+        r = requests.get(api, headers=headers)
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
