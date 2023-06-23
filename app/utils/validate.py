@@ -476,9 +476,9 @@ async def validatePart8(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.put(api, headers=headers)
+        r = requests.post(api, headers=headers)
         if r.status_code == 404:
-            raise ValueError(f'PUT {api} not found')
+            raise ValueError(f'POST {api} not found')
         if r.status_code != status_code:
             raise ValueError(err_msg)
         return r.json()
@@ -590,7 +590,7 @@ async def validatePart10(server):
         if r.status_code != status_code:
             raise ValueError(err_msg)
         return r.json()
-        
+
     user1_body, user1_signin_body = get_new_user()
     try:
         signup(server, user1_body, 200, f'SignUp Failed, input: {user1_body}')
@@ -598,13 +598,10 @@ async def validatePart10(server):
         data1 = check_signin_valid(response, user1_body)
 
         data = create_post(server, 'test post 01', data1.get('token'), 200, f"Cannot create post, context: test post 01, jwt: {data1.get('token')}")
-        print(data)
         post_id = data.get('data', {}).get('post', {}).get('id')
         if not post_id:
             raise ValueError('Post id is null')
-        
         data = edit_post(post_id, 'edited test post 01', data1.get('token'), 200, f"Update post failed, post_id: {post_id}, context: edited test post 01, jwt: {data1.get('token')}")
-        print(data)
         post_id = data.get('data', {}).get('post', {}).get('id')
 
     except Exception as e:
@@ -796,7 +793,6 @@ async def validatePart13(server):
         create_post(server, 'test post 01', data1.get('token'), 200, f"Cannot create post, context: test post 01, jwt: {data1.get('token')}")
         # user1
         data = search_posts(data1['token'], '', 200, f"[User1] Search post failed, jwt: {data1['token']}")
-        print(data)
         cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor != None):
@@ -806,7 +802,6 @@ async def validatePart13(server):
 
         # user2's feed (user1's friend)
         data = search_posts(data2['token'], '', 200, f"[User2] Search post failed, jwt: {data2['token']}")
-        print(data)
         cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor != None):
@@ -816,7 +811,6 @@ async def validatePart13(server):
 
         # user1's post lists
         data = search_posts(data2['token'], f"?user_id={data1.get('user_id')}", 200, f"[User2] Search post failed, user_id: {data1.get('user_id')}, jwt: {data2['token']}")
-        print(data)
         cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor != None):
@@ -826,7 +820,6 @@ async def validatePart13(server):
 
         # user3's feed
         data = search_posts(data3['token'], '', 200, f"[User3] Search post failed, jwt: {data3['token']}")
-        print(data)
         cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor != None):
@@ -847,9 +840,6 @@ async def validatePart13(server):
 
         # user1
         data = search_posts(data1['token'], '', 200, f"[User1] Search post failed, jwt: {data1['token']}")
-        
-        print(data1['token'])
-        print(data)
         cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor == None):
@@ -867,7 +857,6 @@ async def validatePart13(server):
 
         # user2
         data = search_posts(data2['token'], f"?user_id={data1['user_id']}", 200, f"[User1] Search post failed, user_id: {data1['user_id']}, jwt: {data2['token']}")
-        print(data)
         cursor = data['data']['next_cursor']
         posts = data['data']['posts']
         if (cursor == None):
