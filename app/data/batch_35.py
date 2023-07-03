@@ -8,6 +8,146 @@ students = [
         "github_name": "daniel820710",
         "server": "http://54.250.180.147:3000"
     },
+    {
+        "batch": BATCH,
+        "name": "yingching",
+        "email": "mary870818@yahoo.com.tw",
+        "github_name": "Ahban08",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "hsuanju",
+        "email": "danxuanru@gmail.com",
+        "github_name": "danxuanru",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "chiahua",
+        "email": "s24527109@gmail.com",
+        "github_name": "gahwa17",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "chihhung",
+        "email": "tony901014@gmail.com",
+        "github_name": "CCHTony",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "peiyu",
+        "email": "sophiachen1124@gmail.com",
+        "github_name": "peifish1124 ",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "jessica",
+        "email": "jessica.ychuang@gmail.com",
+        "github_name": "ycccccccccccc",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "mengchieh",
+        "email": "jk211896@gmail.com",
+        "github_name": "MengChiehLiu",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "kuanfu",
+        "email": "liu635588@gmail.com",
+        "github_name": "quevenliu",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "zihrong",
+        "email": "gino79445@cmlab.csie.ntu.edu.tw",
+        "github_name": "gino79445",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "chenwei",
+        "email": "trinky.cw.su@gmail.com",
+        "github_name": "OWO1430",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "weiting",
+        "email": "110306033@g.nccu.edu.tw",
+        "github_name": "Lu-weiting",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "haoting",
+        "email": "haoting.tung@outlook.com",
+        "github_name": "i-am-harveyt",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "steven",
+        "email": "sindistant@gmail.com",
+        "github_name": "Distant22",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "yinhsiang",
+        "email": "timsu92@gmail.com",
+        "github_name": "timsu92",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "hsinyun",
+        "email": "lai1029700@gmail.com",
+        "github_name": "lai10297000",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "yuwei",
+        "email": "gemii0606@gmail.com",
+        "github_name": "gemii0606",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "lesheng",
+        "email": "raymand0109@gmail.com",
+        "github_name": "123r123",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "yihsuan",
+        "email": "jals24215@gmail.com",
+        "github_name": "yiiihsuan",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "peitung",
+        "email": "ptchen1116@gmail.com",
+        "github_name": "PTC1116",
+        "server": ""
+    },
+    {
+        "batch": BATCH,
+        "name": "anluen",
+        "email": "annie820802@gmail.com",
+        "github_name": "anluenjeng",
+        "server": ""
+    }
 ]
 
 assignments = [
