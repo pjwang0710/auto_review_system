@@ -25,7 +25,7 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
     elif payload.get('pull_request'):
         if payload.get('pull_request', {}).get('merged_at'):
             validate_type = VALIDATE_TYPES.MERGE
-        elif payload.get('action') == 'opened' or payload.get('action') == 'synchronize':
+        elif payload.get('action') == 'reopened' or payload.get('action') == 'opened' or payload.get('action') == 'synchronize':
             pr_number = payload.get('pull_request', {}).get('number')
             validate_type = VALIDATE_TYPES.PULL_REQUEST
         uri = payload.get('pull_request', {}).get('issue_url') + '/comments'
