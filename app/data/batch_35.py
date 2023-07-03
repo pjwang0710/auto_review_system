@@ -40,7 +40,7 @@ students = [
         "batch": BATCH,
         "name": "peiyu",
         "email": "sophiachen1124@gmail.com",
-        "github_name": "peifish1124 ",
+        "github_name": "peifish1124",
         "server": ""
     },
     {
