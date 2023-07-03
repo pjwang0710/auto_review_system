@@ -19,6 +19,7 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
     uri = None
     validate_type = None
     pr_number = None
+    print('action:', payload.get('action'))
     if payload.get('action') == 'closed' and not payload.get('pull_request', {}).get('merged_at'):
         validate_type = VALIDATE_TYPES.CLOSED
     elif payload.get('pull_request'):
