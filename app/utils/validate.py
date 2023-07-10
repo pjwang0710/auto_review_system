@@ -85,6 +85,20 @@ def send_friend_request(server, user_id, token, status_code, err_msg):
     return r.json()
 
 
+def get_friend_pending_list(server, token, status_code, err_msg):
+    api = f'{server}/api/1.0/friends/pending'
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {token}'
+    }
+    r = requests.get(api, headers=headers)
+    if r.status_code == 404:
+        raise ValueError(f'GET {api} not found')
+    if r.status_code != status_code:
+        raise ValueError(err_msg)
+    return r.json()
+
+
 def send_friend_request_agree(server, friendship_id, token, status_code, err_msg):
     api = f'{server}/api/1.0/friends/{friendship_id}/agree'
     headers = {
@@ -401,6 +415,16 @@ async def validatePart6(server):
         response = signin(server, user2_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
         data2 = check_signin_valid(response, user2_body)
         response = send_friend_request(server, data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
+        response = get_friend_pending_list(server, data2.get('token'), 200, f"Get Friend Pending Error, jwt: {data2.get('token')}")
+        if len(response.get('data', {}).get('users', [])) != 1:
+            raise ValueError(f"Get pending error, users is empty, response: {response.get('data', {})}")
+        if response.get('data', {}).get('users', [])[0].get('id') != data1.get('user_id'):
+            raise ValueError(f"Get pending error, user's id != {data1.get('user_id')}, response: {response.get('data', {})}")
+        if response.get('data', {}).get('users', [])[0].get('friendship', {}).get('id') is None:
+            raise ValueError(f"Get pending error, frienship id is None, response: {response.get('data', {})}")
+        if response.get('data', {}).get('users', [])[0].get('friendship', {}).get('status') != 'pending':
+            raise ValueError(f"Get pending error, frienship status != pending, response: {response.get('data', {})}")
+
     except Exception as e:
         return {
             'status': 2,
