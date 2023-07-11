@@ -33,7 +33,7 @@ def signup(server, body, status_code, err_msg):
     headers = {
         'Content-Type': 'application/json'
     }
-    r = requests.post(api, json=body, headers=headers, timeout=5)
+    r = requests.post(api, json=body, headers=headers, timeout=10)
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
@@ -46,7 +46,7 @@ def signin(server, body, status_code, err_msg):
     headers = {
         'Content-Type': 'application/json'
     }
-    r = requests.post(api, json=body, headers=headers, timeout=5)
+    r = requests.post(api, json=body, headers=headers, timeout=10)
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
@@ -63,7 +63,7 @@ def create_post(server, context, token, status_code, err_msg):
     body = {
         'context': context
     }
-    r = requests.post(api, json=body, headers=headers, timeout=5)
+    r = requests.post(api, json=body, headers=headers, timeout=10)
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
@@ -77,7 +77,7 @@ def send_friend_request(server, user_id, token, status_code, err_msg):
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {token}'
     }
-    r = requests.post(api, headers=headers, timeout=5)
+    r = requests.post(api, headers=headers, timeout=10)
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
@@ -91,7 +91,7 @@ def get_friend_pending_list(server, token, status_code, err_msg):
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {token}'
     }
-    r = requests.get(api, headers=headers, timeout=5)
+    r = requests.get(api, headers=headers, timeout=10)
     if r.status_code == 404:
         raise ValueError(f'GET {api} not found')
     if r.status_code != status_code:
@@ -105,7 +105,7 @@ def send_friend_request_agree(server, friendship_id, token, status_code, err_msg
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {token}'
     }
-    r = requests.post(api, headers=headers, timeout=5)
+    r = requests.post(api, headers=headers, timeout=10)
     print(r.text)
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
@@ -123,7 +123,7 @@ def delete_friend(server, friendship_id, token, status_code, err_msg):
         }
         print(token)
         print(api)
-        r = requests.delete(api, headers=headers, timeout=5)
+        r = requests.delete(api, headers=headers, timeout=10)
         print(r.text)
         if r.status_code == 404:
             raise ValueError(f'DELETE {api} not found')
@@ -296,7 +296,7 @@ async def validatePart5(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.get(api, headers=headers, timeout=5)
+        r = requests.get(api, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
@@ -309,7 +309,7 @@ async def validatePart5(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.put(api, json=body, headers=headers, timeout=5)
+        r = requests.put(api, json=body, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
@@ -324,7 +324,7 @@ async def validatePart5(server):
         headers = {
             'Authorization': f'Bearer {token}'
         }
-        r = requests.put(api, files=files, headers=headers, timeout=5)
+        r = requests.put(api, files=files, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
@@ -336,7 +336,7 @@ async def validatePart5(server):
         headers = {
             'Content-Type': 'application/json'
         }
-        r = requests.get(api, headers=headers, timeout=5)
+        r = requests.get(api, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
@@ -348,7 +348,7 @@ async def validatePart5(server):
         headers = {
             'Content-Type': 'application/json'
         }
-        r = requests.put(api, json=body, headers=headers, timeout=5)
+        r = requests.put(api, json=body, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
@@ -506,7 +506,7 @@ async def validatePart8(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.get(api, headers=headers, timeout=5)
+        r = requests.get(api, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
@@ -519,7 +519,7 @@ async def validatePart8(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.post(api, headers=headers, timeout=5)
+        r = requests.post(api, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'POST {api} not found')
         if r.status_code != status_code:
@@ -573,7 +573,7 @@ async def validatePart9(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.get(api, headers=headers, timeout=5)
+        r = requests.get(api, headers=headers, timeout=10)
 
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
@@ -627,7 +627,7 @@ async def validatePart10(server):
         body = {
             'context': context
         }
-        r = requests.put(api, json=body, headers=headers, timeout=5)
+        r = requests.put(api, json=body, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
@@ -665,7 +665,7 @@ async def validatePart11(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.post(api, headers=headers, timeout=5)
+        r = requests.post(api, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'POST {api} not found')
         if r.status_code != status_code:
@@ -678,7 +678,7 @@ async def validatePart11(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.post(api, json=body, headers=headers, timeout=5)
+        r = requests.post(api, json=body, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'POST {api} not found')
         if r.status_code != status_code:
@@ -691,7 +691,7 @@ async def validatePart11(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.delete(api, headers=headers, timeout=5)
+        r = requests.delete(api, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'POST {api} not found')
         if r.status_code != status_code:
@@ -730,7 +730,7 @@ async def validatePart12(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.post(api, headers=headers, timeout=5)
+        r = requests.post(api, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'POST {api} not found')
         if r.status_code != status_code:
@@ -743,7 +743,7 @@ async def validatePart12(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.post(api, json=body, headers=headers, timeout=5)
+        r = requests.post(api, json=body, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'POST {api} not found')
         if r.status_code != status_code:
@@ -756,7 +756,7 @@ async def validatePart12(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.get(api, headers=headers, timeout=5)
+        r = requests.get(api, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
@@ -807,7 +807,7 @@ async def validatePart13(server):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
-        r = requests.get(api, headers=headers, timeout=5)
+        r = requests.get(api, headers=headers, timeout=10)
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
