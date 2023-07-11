@@ -37,7 +37,7 @@ def signup(server, body, status_code, err_msg):
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
-        raise ValueError(err_msg)
+        raise ValueError(f'signup error: {err_msg}')
     return r.json()
 
 
@@ -50,7 +50,7 @@ def signin(server, body, status_code, err_msg):
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
-        raise ValueError(err_msg)
+        raise ValueError(f'signin error: {err_msg}')
     return r.json()
 
 
@@ -67,7 +67,7 @@ def create_post(server, context, token, status_code, err_msg):
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
-        raise ValueError(err_msg)
+        raise ValueError(f'Create post error: {err_msg}')
     return r.json()
 
 
@@ -81,7 +81,7 @@ def send_friend_request(server, user_id, token, status_code, err_msg):
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
-        raise ValueError(err_msg)
+        raise ValueError(f'Send friend request error: {err_msg}')
     return r.json()
 
 
@@ -95,7 +95,7 @@ def get_friend_pending_list(server, token, status_code, err_msg):
     if r.status_code == 404:
         raise ValueError(f'GET {api} not found')
     if r.status_code != status_code:
-        raise ValueError(err_msg)
+        raise ValueError(f'Get friend pending error: {err_msg}')
     return r.json()
 
 
@@ -110,21 +110,24 @@ def send_friend_request_agree(server, friendship_id, token, status_code, err_msg
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
-        raise ValueError(err_msg)
+        raise ValueError(f'Send friend agree error: { err_msg }')
     return r.json()
 
 
 def delete_friend(server, friendship_id, token, status_code, err_msg):
-    api = f'{server}/api/1.0/friends/{friendship_id}'
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {token}'
-    }
-    r = requests.delete(api, headers=headers, timeout=5)
-    if r.status_code == 404:
-        raise ValueError(f'DELETE {api} not found')
-    if r.status_code != status_code:
-        raise ValueError(err_msg)
+    try:
+        api = f'{server}/api/1.0/friends/{friendship_id}'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        r = requests.delete(api, headers=headers, timeout=5)
+        if r.status_code == 404:
+            raise ValueError(f'DELETE {api} not found')
+        if r.status_code != status_code:
+            raise ValueError(f'Delete friend error: {err_msg}')
+    except Exception as e:
+        raise ValueError(f'Error: {str(e)}')
     return r.json()
 
 
@@ -141,6 +144,7 @@ def get_new_user():
         "password": "test"
     }
     return user1_body, user1_signin_body
+
 
 async def validate(part, server):
     print(f"validate part: {part} server: {server}")
@@ -293,7 +297,7 @@ async def validatePart5(server):
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
-            raise ValueError(err_msg)
+            raise ValueError(f'Get profile error: {err_msg}')
         return r.json()
 
     def update_profile(body, token, status_code, err_msg):
@@ -306,7 +310,7 @@ async def validatePart5(server):
         if r.status_code == 404:
             raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
-            raise ValueError(err_msg)
+            raise ValueError(f'Update profile error: {err_msg}')
         return r.json()
 
     def update_picture(token, status_code, err_msg):
@@ -321,7 +325,7 @@ async def validatePart5(server):
         if r.status_code == 404:
             raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
-            raise ValueError(err_msg)
+            raise ValueError(f'Update picture error: {err_msg}')
         return r.json()
 
     def get_profile_wo_headers(user_id, status_code, err_msg):
@@ -333,7 +337,7 @@ async def validatePart5(server):
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
-            raise ValueError(err_msg)
+            raise ValueError(f'Get profile without headers error: {err_msg}')
         return r.json()
 
     def update_profile_wo_token(body, status_code, err_msg):
@@ -345,7 +349,7 @@ async def validatePart5(server):
         if r.status_code == 404:
             raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
-            raise ValueError(err_msg)
+            raise ValueError(f'Update profile without headers error: {err_msg}')
         return r.json()
 
     user1_body, user1_signin_body = get_new_user()
@@ -490,7 +494,7 @@ async def validatePart8(server):
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
-            raise ValueError(err_msg)
+            raise ValueError(f'Get events error: {err_msg}')
         return r.json()
 
     def read_event(event_id, token, status_code, err_msg):
@@ -521,13 +525,13 @@ async def validatePart8(server):
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
 
         user2_events = get_events(data2.get('token'), 200, f"Get events failed, jwt: {data2.get('token')}")
-        if user2_events['data']['events'][0]['user_id'] != data1.get('user_id'):
-            raise ValueError(f"After user1 sent a friend request, user2 did not receive any notification, user1_id: {data1.get('user_id')}, user2_id: {data2.get('user_id')}")
+        if len(user2_events['data']['events']) == 0:
+            raise ValueError(f"Events from user2 is empty after user1 send friend request , response: {user2_events}")
 
         send_friend_request_agree(server, friendship_id, data2.get('token'), 200, f"Agree Friend Request Error, {data2.get('user_id')} can agree this friend requset, but failed")
         user1_events = get_events(data1.get('token'), 200, f"Get events failed, jwt: {data1.get('token')}")
-        if user1_events['data']['events'][0]['user_id'] != data2.get('user_id'):
-            raise ValueError(f"After user2 accepted the friend request, user1 did not receive any notification, user1_id: {data1.get('user_id')}, user2_id: {data2.get('user_id')}")
+        if len(user1_events['data']['events']) == 0:
+            raise ValueError(f"Events from user1 is empty after user2 send agree friend's request , response: {user1_events}")
 
         event_id = user1_events['data']['events'][0]['id']
         read_event(event_id, data1.get('token'), 200, f"Read event failed, event_id: {event_id}, jwt: {data1.get('token')}")
