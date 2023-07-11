@@ -121,7 +121,9 @@ def delete_friend(server, friendship_id, token, status_code, err_msg):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
+        print(api)
         r = requests.delete(api, headers=headers, timeout=5)
+        print(r.text)
         if r.status_code == 404:
             raise ValueError(f'DELETE {api} not found')
         if r.status_code != status_code:
