@@ -106,21 +106,21 @@ async def add_progresses(request: Request, db=Depends(get_database)) -> Any:
     # 4. post result
     if validate_type == VALIDATE_TYPES.PULL_REQUEST or validate_type == VALIDATE_TYPES.COMMENT:
         post_comment(uri, valid_result.get('message'))
-        commits = get_commits(pr_number)
-
-        suggestions = []
-        seen = {}
-        for commit in commits[::-1]:
-            for file in commit.get('file_meta'):
-                if not file.get('path').endswith(".js"):
-                    continue
-                if seen.get(file.get('path')):
-                    continue
-                patch = file.get('patch')
-                reviews = code_review(patch)
-                suggestions.append(f"filename: {file.get('path')} <br />suggestion: {reviews.get('suggestion')} <br />event: {reviews.get('event')}")
-                seen[file.get('path')] = True
-        if suggestions == []:
-            post_comment(uri, "[ChatGPT]<br /> .js file was not detected.")
-        else:    
-            post_comment(uri, "[ChatGPT]<br />" + "<br /><br />".join(suggestions))
+        if (valid_result.get('message') == 'Congrats! You just passed the basic validation.'):
+            commits = get_commits(pr_number)
+            suggestions = []
+            seen = {}
+            for commit in commits[::-1]:
+                for file in commit.get('file_meta'):
+                    if not file.get('path').endswith(".js") and not file.get('path').endswith(".ts"):
+                        continue
+                    if seen.get(file.get('path')):
+                        continue
+                    patch = file.get('patch')
+                    reviews = code_review(patch)
+                    suggestions.append(f"filename: {file.get('path')} <br />suggestion: <br /> {reviews.get('suggestion')} <br />event: {reviews.get('event')}")
+                    seen[file.get('path')] = True
+            if suggestions == []:
+                post_comment(uri, "[ChatGPT]<br /> .js file was not detected.")
+            else:    
+                post_comment(uri, "[ChatGPT]<br />" + "<br /><br />".join(suggestions).replace('\n', '<br />'))

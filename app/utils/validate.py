@@ -451,7 +451,7 @@ async def validatePart7(server):
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
 
         # Test agree with being friend
-        send_friend_request_agree(server, friendship_id, data1.get('token'), 401, f"Agree Friend Request Error, {data2.get('user_id')} can agree this requset, but {data1.get('user_id')} cannot.You have to return error: 400")
+        send_friend_request_agree(server, friendship_id, data1.get('token'), 400, f"Agree Friend Request Error, {data2.get('user_id')} can agree this requset, but {data1.get('user_id')} cannot.You have to return error: 400")
         send_friend_request_agree(server, friendship_id, data2.get('token'), 200, f"Agree Friend Request Error, {data2.get('user_id')} can agree this friend requset, but failed")
 
         # user1 test delete friend 
@@ -460,7 +460,7 @@ async def validatePart7(server):
         # user1 test delete friend before being friend
         response = send_friend_request(server, data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
-        delete_friend(friendship_id, data1.get('token'), 200, f"User1 Cannot delete friend, friendship_id: {friendship_id}, jwt: {data1.get('token')}")
+        delete_friend(server, friendship_id, data1.get('token'), 200, f"User1 Cannot delete friend, friendship_id: {friendship_id}, jwt: {data1.get('token')}")
 
         # user2 test delete friend
         response = send_friend_request(server, data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
