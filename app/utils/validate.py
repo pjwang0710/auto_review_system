@@ -37,7 +37,7 @@ def signup(server, body, status_code, err_msg):
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
-        raise ValueError(f'signup error: {err_msg}')
+        raise ValueError(err_msg)
     return r.json()
 
 
@@ -50,7 +50,7 @@ def signin(server, body, status_code, err_msg):
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
-        raise ValueError(f'signin error: {err_msg}')
+        raise ValueError(err_msg)
     return r.json()
 
 
@@ -67,7 +67,7 @@ def create_post(server, context, token, status_code, err_msg):
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
-        raise ValueError(f'Create post error: {err_msg}')
+        raise ValueError(err_msg)
     return r.json()
 
 
@@ -81,7 +81,7 @@ def send_friend_request(server, user_id, token, status_code, err_msg):
     if r.status_code == 404:
         raise ValueError(f'POST {api} not found')
     if r.status_code != status_code:
-        raise ValueError(f'Send friend request error: {err_msg}')
+        raise ValueError(err_msg)
     return r.json()
 
 
@@ -95,7 +95,7 @@ def get_friend_pending_list(server, token, status_code, err_msg):
     if r.status_code == 404:
         raise ValueError(f'GET {api} not found')
     if r.status_code != status_code:
-        raise ValueError(f'Get friend pending error: {err_msg}')
+        raise ValueError(err_msg)
     return r.json()
 
 
@@ -128,7 +128,7 @@ def delete_friend(server, friendship_id, token, status_code, err_msg):
         if r.status_code == 404:
             raise ValueError(f'DELETE {api} not found')
         if r.status_code != status_code:
-            raise ValueError(f'Delete friend error: {err_msg}')
+            raise ValueError(err_msg)
     except Exception as e:
         raise ValueError(f'Error: {str(e)}')
     return r.json()
@@ -300,7 +300,7 @@ async def validatePart5(server):
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
-            raise ValueError(f'Get profile error: {err_msg}')
+            raise ValueError(err_msg)
         return r.json()
 
     def update_profile(body, token, status_code, err_msg):
@@ -313,7 +313,7 @@ async def validatePart5(server):
         if r.status_code == 404:
             raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
-            raise ValueError(f'Update profile error: {err_msg}')
+            raise ValueError(err_msg)
         return r.json()
 
     def update_picture(token, status_code, err_msg):
@@ -328,7 +328,7 @@ async def validatePart5(server):
         if r.status_code == 404:
             raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
-            raise ValueError(f'Update picture error: {err_msg}')
+            raise ValueError(err_msg)
         return r.json()
 
     def get_profile_wo_headers(user_id, status_code, err_msg):
@@ -340,7 +340,7 @@ async def validatePart5(server):
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
-            raise ValueError(f'Get profile without headers error: {err_msg}')
+            raise ValueError(err_msg)
         return r.json()
 
     def update_profile_wo_token(body, status_code, err_msg):
@@ -352,7 +352,7 @@ async def validatePart5(server):
         if r.status_code == 404:
             raise ValueError(f'PUT {api} not found')
         if r.status_code != status_code:
-            raise ValueError(f'Update profile without headers error: {err_msg}')
+            raise ValueError(err_msg)
         return r.json()
 
     user1_body, user1_signin_body = get_new_user()
@@ -446,47 +446,31 @@ async def validatePart7(server):
     user1_body, user1_signin_body = get_new_user()
     user2_body, user2_signin_body = get_new_user()
     try:
-        print('A')
         signup(server, user1_body, 200, f'SignUp Failed, input: {user1_body}')
-        print('B')
         signup(server, user2_body, 200, f'SignUp Failed, input: {user2_body}')
-        print('C')
         response = signin(server, user1_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
-        print('D')
         data1 = check_signin_valid(response, user1_body)
-        print('E')
         response = signin(server, user2_signin_body, 200, f'SignIn Failed, input: {user1_signin_body}')
-        print('F')
         data2 = check_signin_valid(response, user2_body)
-        print('G')
 
         # Test send create friendship
         response = send_friend_request(server, data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
-        print('H')
         # Test agree with being friend
         send_friend_request_agree(server, friendship_id, data1.get('token'), 400, f"Agree Friend Request Error, {data2.get('user_id')} can agree this requset, but {data1.get('user_id')} cannot.You have to return error: 400")
-        print('I')
         send_friend_request_agree(server, friendship_id, data2.get('token'), 200, f"Agree Friend Request Error, {data2.get('user_id')} can agree this friend requset, but failed")
-        print('J')
         # user1 test delete friend 
         delete_friend(server, friendship_id, data1.get('token'), 200, f"User1 Cannot delete friend, friendship_id: {friendship_id}, jwt: {data1.get('token')}")
-        print('K')
         # user1 test delete friend before being friend
         response = send_friend_request(server, data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
-        print('L')
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
         delete_friend(server, friendship_id, data1.get('token'), 200, f"User1 Cannot delete friend, friendship_id: {friendship_id}, jwt: {data1.get('token')}")
-        print('M')
 
         # user2 test delete friend
         response = send_friend_request(server, data2.get('user_id'), data1.get('token'), 200, f"Send Friend Request Error, user_id: {data2.get('user_id')}, jwt: {data1.get('token')}")
-        print('N')
         friendship_id = response.get('data', {}).get('friendship', {}).get('id')
         send_friend_request_agree(server, friendship_id, data2.get('token'), 200, f"Agree Friend Request Error, {data2.get('user_id')} can agree this friend requset, but failed")
-        print('O')
         delete_friend(server, friendship_id, data2.get('token'), 200, f"User2 Cannot delete friend, friendship_id: {friendship_id}, jwt: {data2.get('token')}")
-        print('P')
 
     except Exception as e:
         return {
@@ -510,7 +494,7 @@ async def validatePart8(server):
         if r.status_code == 404:
             raise ValueError(f'GET {api} not found')
         if r.status_code != status_code:
-            raise ValueError(f'Get events error: {err_msg}')
+            raise ValueError(err_msg)
         return r.json()
 
     def read_event(event_id, token, status_code, err_msg):
