@@ -121,6 +121,7 @@ def delete_friend(server, friendship_id, token, status_code, err_msg):
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
         }
+        print(token)
         print(api)
         r = requests.delete(api, headers=headers, timeout=5)
         print(r.text)
